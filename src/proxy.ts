@@ -5,19 +5,22 @@ const publicPaths = ["/login", "/signup", "/auth/callback"];
 
 export async function proxy(request: NextRequest) {
   const { supabase, supabaseResponse } = createClient(request);
-  const { data: { user } } = await supabase.auth.getUser();
-  const { pathname } = request.nextUrl;
 
-  if (!user && !publicPaths.some((p) => pathname.startsWith(p))) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
+  if (supabase) {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { pathname } = request.nextUrl;
 
-  if (user && publicPaths.some((p) => pathname.startsWith(p))) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
+    if (!user && !publicPaths.some((p) => pathname.startsWith(p))) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+
+    if (user && publicPaths.some((p) => pathname.startsWith(p))) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;
