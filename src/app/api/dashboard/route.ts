@@ -63,6 +63,7 @@ export async function GET(_req: NextRequest) {
       monthlyRevenue,
     });
   } catch (error) {
-    return Response.json({ error: "Failed to fetch dashboard data" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    return Response.json({ error: "Failed to fetch dashboard data", detail: msg }, { status: 500 });
   }
 }
