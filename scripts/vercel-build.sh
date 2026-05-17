@@ -13,14 +13,17 @@ sed -i 's/provider = "sqlite"/provider = "postgresql"/' prisma/schema.prisma
 cat > src/lib/db.ts << 'DBCONTENT'
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { Pool } from "@neondatabase/serverless";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+
+const poolConfig = {
+  connectionString: process.env.DATABASE_URL!,
+};
 
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    adapter: new PrismaNeon(new Pool({ connectionString: process.env.DATABASE_URL })),
+    adapter: new PrismaNeon(poolConfig),
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
