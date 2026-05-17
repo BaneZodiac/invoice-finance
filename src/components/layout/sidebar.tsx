@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { useAuth } from "@/contexts/auth-context";
 import {
   LayoutDashboard,
   FileText,
@@ -12,6 +13,8 @@ import {
   Wallet,
   BarChart3,
   Settings,
+  LogOut,
+  User,
 } from "lucide-react";
 
 const navItems = [
@@ -30,6 +33,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   const pathname = usePathname();
+  const { user, signOut } = useAuth();
 
   return (
     <aside
@@ -43,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <FileText className="w-4 h-4 text-white" />
           </div>
-          <span className="text-lg font-bold text-gray-900">FinanceFlow</span>
+          <span className="text-lg font-bold text-gray-900">Nomads Finance</span>
         </Link>
       </div>
 
@@ -72,8 +76,27 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
         })}
       </nav>
 
-      <div className="px-4 py-4 border-t border-gray-200">
-        <p className="text-xs text-gray-400">FinanceFlow v1.0</p>
+      <div className="px-4 py-4 border-t border-gray-200 space-y-3">
+        {user && (
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+              <User className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user.email?.split("@")[0]}
+              </p>
+              <p className="text-xs text-gray-500 truncate">{user.email}</p>
+            </div>
+          </div>
+        )}
+        <button
+          onClick={signOut}
+          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+        >
+          <LogOut className="w-5 h-5 flex-shrink-0" />
+          <span>Sign out</span>
+        </button>
       </div>
     </aside>
   );
