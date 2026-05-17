@@ -13,15 +13,21 @@ sed -i 's/provider = "sqlite"/provider = "postgresql"/' prisma/schema.prisma
 cat > src/lib/db.ts << 'DBCONTENT'
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 function createPrismaClient() {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error("DATABASE_URL environment variable is not set");
+  }
+  const pool = new pg.Pool({
+    connectionString: url,
+    ssl: { rejectUnauthorized: false },
+  });
   return new PrismaClient({
-    adapter: new PrismaPg({
-      connectionString: process.env.DATABASE_URL!,
-      ssl: { rejectUnauthorized: false },
-    }),
+    adapter: new PrismaPg(pool),
   });
 }
 
@@ -34,7 +40,7 @@ DBCONTENT
 npx prisma generate
 
 # Push schema to database
-npx prisma db push --accept-data-loss 2>/dev/null || true
+npx prisma db push --accept-data-loss || echo "⚠️ prisma db push failed, continuing..."
 
 echo "✅ PostgreSQL setup complete. Running Next.js build..."
 next build
