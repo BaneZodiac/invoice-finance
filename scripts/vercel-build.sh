@@ -7,8 +7,7 @@ echo "📦 Vercel build: Switching to PostgreSQL..."
 # Update Prisma schema provider to PostgreSQL
 sed -i 's/provider = "sqlite"/provider = "postgresql"/' prisma/schema.prisma
 
-# Install PostgreSQL adapter
-npm install @prisma/adapter-neon @neondatabase/serverless --no-save
+# PostgreSQL adapters are already in package.json
 
 # Replace db.ts with PostgreSQL version
 cat > src/lib/db.ts << 'DBCONTENT'
