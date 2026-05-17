@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Company {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @default("")
+  phone       String   @default("")
+  address     String   @default("")
+  city        String   @default("")
+  state       String   @default("")
+  zip         String   @default("")
+  country     String   @default("")
+  taxId       String   @default("")
+  logo        String   @default("")
+  currency    String   @default("USD")
+  invoiceNote String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  expenses    Expense[]
+  invoices    Invoice[]
+  quotations  Quotation[]
+  transactions Transaction[]
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @default("")
+  phone     String   @default("")
+  address   String   @default("")
+  city      String   @default("")
+  state     String   @default("")
+  zip       String   @default("")
+  country   String   @default("")
+  taxId     String   @default("")
+  notes     String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoices   Invoice[]
+  quotations Quotation[]
+}
+
+model Invoice {
+  id           String      @id @default(uuid())
+  number       String      @unique
+  status       String      @default("draft") // draft, sent, paid, overdue, cancelled
+  type         String      @default("invoice") // invoice, credit_note, debit_note
+  issueDate    DateTime    @default(now())
+  dueDate      DateTime
+  paidAt       DateTime?
+  subtotal     Float       @default(0)
+  taxRate      Float       @default(0)
+  taxAmount    Float       @default(0)
+  discount     Float       @default(0)
+  total        Float       @default(0)
+  amountPaid   Float       @default(0)
+  notes        String      @default("")
+  terms        String      @default("")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  companyId    String
+  clientId     String
+  company      Company     @relation(fields: [companyId], references: [id])
+  client       Client      @relation(fields: [clientId], references: [id])
+  items        InvoiceItem[]
+  transactions Transaction[]
+}
+
+model InvoiceItem {
+  id          String  @id @default(uuid())
+  description String
+  quantity    Float   @default(1)
+  unitPrice   Float   @default(0)
+  amount      Float   @default(0)
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Quotation {
+  id        String         @id @default(uuid())
+  number    String         @unique
+  status    String         @default("draft") // draft, sent, accepted, rejected, expired
+  issueDate DateTime       @default(now())
+  validUntil DateTime
+  subtotal  Float          @default(0)
+  taxRate   Float          @default(0)
+  taxAmount Float          @default(0)
+  discount  Float          @default(0)
+  total     Float          @default(0)
+  notes     String         @default("")
+  terms     String         @default("")
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  companyId  String
+  clientId   String
+  company    Company        @relation(fields: [companyId], references: [id])
+  client     Client         @relation(fields: [clientId], references: [id])
+  items      QuotationItem[]
+  convertedToInvoiceId String?
+}
+
+model QuotationItem {
+  id           String    @id @default(uuid())
+  description  String
+  quantity     Float     @default(1)
+  unitPrice    Float     @default(0)
+  amount       Float     @default(0)
+  quotationId  String
+  quotation    Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  description String
+  category    String   @default("other") // office, travel, utilities, supplies, rent, salaries, marketing, other
+  amount      Float
+  taxAmount   Float    @default(0)
+  date        DateTime @default(now())
+  receiptUrl  String   @default("")
+  notes       String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+}
+
+model Account {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  name      String
+  type      String   // asset, liability, equity, revenue, expense
+  subtype   String   @default("")
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  debits  Transaction[] @relation("DebitAccount")
+  credits Transaction[] @relation("CreditAccount")
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  date        DateTime @default(now())
+  description String
+  debitAmount  Float    @default(0)
+  creditAmount Float    @default(0)
+  reference   String   @default("") // invoice/expense number reference
+  createdAt   DateTime @default(now())
+
+  debitAccountId  String
+  creditAccountId String
+  companyId       String
+  invoiceId       String?
+
+  debitAccount  Account  @relation("DebitAccount", fields: [debitAccountId], references: [id])
+  creditAccount Account  @relation("CreditAccount", fields: [creditAccountId], references: [id])
+  company       Company  @relation(fields: [companyId], references: [id])
+  invoice       Invoice? @relation(fields: [invoiceId], references: [id])
+}
