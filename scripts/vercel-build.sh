@@ -13,7 +13,6 @@ sed -i 's/provider = "sqlite"/provider = "postgresql"/' prisma/schema.prisma
 cat > src/lib/db.ts << 'DBCONTENT'
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import pg from "pg";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
@@ -22,12 +21,12 @@ function createPrismaClient() {
   if (!url) {
     throw new Error("DATABASE_URL environment variable is not set");
   }
-  const pool = new pg.Pool({
-    connectionString: url,
-    ssl: { rejectUnauthorized: false },
-  });
   return new PrismaClient({
-    adapter: new PrismaPg(pool),
+    adapter: new PrismaPg({
+      connectionString: url,
+      ssl: { rejectUnauthorized: false },
+    }),
+    datasourceUrl: url,
   });
 }
 
