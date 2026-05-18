@@ -22,13 +22,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       where: { id },
       data: updateData,
       include: {
-        client: { select: { id: true, name: true } },
-        company: { select: { id: true, name: true } },
+        client: true,
+        company: true,
+        items: true,
       },
     });
 
     return Response.json(invoice);
   } catch (error) {
-    return Response.json({ error: "Failed to update invoice status" }, { status: 500 });
+    const detail = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: "Failed to update invoice status", detail }, { status: 500 });
   }
 }

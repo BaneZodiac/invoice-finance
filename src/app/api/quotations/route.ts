@@ -14,7 +14,8 @@ export async function GET() {
     });
     return Response.json(quotations);
   } catch (error) {
-    return Response.json({ error: "Failed to fetch quotations" }, { status: 500 });
+    const detail = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: "Failed to fetch quotations", detail }, { status: 500 });
   }
 }
 
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
         number: quotationData.number || generateQuotationNumber(),
         status: quotationData.status || "draft",
         issueDate: quotationData.issueDate ? new Date(quotationData.issueDate) : new Date(),
-        validUntil: new Date(quotationData.validUntil),
+        validUntil: quotationData.validUntil ? new Date(quotationData.validUntil) : (quotationData.dueDate ? new Date(quotationData.dueDate) : new Date(Date.now() + 30 * 86400000)),
         subtotal: calculated.subtotal,
         taxRate: quotationData.taxRate || 0,
         taxAmount: calculated.taxAmount,
@@ -68,6 +69,7 @@ export async function POST(req: NextRequest) {
 
     return Response.json(quotation, { status: 201 });
   } catch (error) {
-    return Response.json({ error: "Failed to create quotation" }, { status: 500 });
+    const detail = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: "Failed to create quotation", detail }, { status: 500 });
   }
 }

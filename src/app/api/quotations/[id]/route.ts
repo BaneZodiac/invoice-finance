@@ -42,7 +42,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         number: quotationData.number,
         status: quotationData.status,
         issueDate: quotationData.issueDate ? new Date(quotationData.issueDate) : undefined,
-        validUntil: quotationData.validUntil ? new Date(quotationData.validUntil) : undefined,
+        validUntil: quotationData.validUntil ? new Date(quotationData.validUntil) : (quotationData.dueDate ? new Date(quotationData.dueDate) : undefined),
         subtotal: calculated.subtotal,
         taxRate: quotationData.taxRate || 0,
         taxAmount: calculated.taxAmount,
