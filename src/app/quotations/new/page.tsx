@@ -21,7 +21,7 @@ export default function NewQuotationPage() {
       })
       if (!res.ok) {
         const err = await res.json()
-        throw new Error(err.message || "Failed to create quotation")
+        throw new Error(err.error || err.message || "Failed to create quotation")
       }
       const quotation = await res.json()
       router.push(`/quotations/${quotation.id}`)

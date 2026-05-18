@@ -58,6 +58,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { items, ...invoiceData } = body;
 
+    if (!invoiceData.companyId) {
+      const company = await prisma.company.findFirst({ orderBy: { createdAt: "asc" } });
+      if (company) invoiceData.companyId = company.id;
+    }
+
     const calculated = calculateInvoice(
       invoiceData.subtotal || 0,
       invoiceData.taxRate || 0,

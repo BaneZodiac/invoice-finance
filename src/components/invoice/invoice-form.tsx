@@ -136,12 +136,29 @@ function InvoiceForm({
   const taxAmount = taxableAmount * (formData.taxRate / 100);
   const total = taxableAmount + taxAmount;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    let data = { ...formData };
+
+    if (showNewClient && newClientName.trim()) {
+      try {
+        const res = await fetch("/api/clients", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: newClientName.trim() }),
+        });
+        if (res.ok) {
+          const client = await res.json();
+          data.clientId = client.id;
+        }
+      } catch {}
+    }
+
     if (onSubmit) {
-      onSubmit(formData);
+      onSubmit(data);
     } else if (onSave) {
-      onSave(formData);
+      onSave(data);
     }
   };
 

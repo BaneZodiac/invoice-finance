@@ -21,6 +21,11 @@ model Company {
   logo        String   @default("")
   currency    String   @default("USD")
   invoiceNote String   @default("")
+  taxRate       Float    @default(0)
+  invoicePrefix String   @default("INV-")
+  quotationPrefix String   @default("QTN-")
+  defaultPaymentTerms Int      @default(30)
+  defaultDueDays    Int      @default(30)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

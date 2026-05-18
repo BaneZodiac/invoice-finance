@@ -18,6 +18,12 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    if (!body.companyId) {
+      const company = await prisma.company.findFirst({ orderBy: { createdAt: "asc" } });
+      if (company) body.companyId = company.id;
+    }
+
     const expense = await prisma.expense.create({
       data: {
         description: body.description,
