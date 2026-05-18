@@ -35,7 +35,7 @@ export default function InvoicesPage() {
       const res = await fetch(`/api/invoices?${params}`)
       if (!res.ok) throw new Error("Failed to fetch")
       const data = await res.json()
-      setInvoices(data)
+      setInvoices(data.invoices ?? [])
     } catch {
       setError("Failed to load invoices")
     } finally {
