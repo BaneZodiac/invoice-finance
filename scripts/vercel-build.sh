@@ -25,6 +25,8 @@ function createPrismaClient() {
   const pool = new pg.Pool({
     connectionString: url,
     ssl: { rejectUnauthorized: false },
+    max: 1,
+    idleTimeoutMillis: 0,
   });
   return new PrismaClient({
     adapter: new PrismaPg(pool),
