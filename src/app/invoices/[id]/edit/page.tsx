@@ -38,7 +38,7 @@ export default function EditInvoicePage({ params }: { params: Promise<{ id: stri
       })
       if (!res.ok) {
         const err = await res.json()
-        throw new Error(err.error || err.message || "Failed to update invoice")
+        throw new Error(err.detail || err.error || err.message || "Failed to update invoice")
       }
       router.push(`/invoices/${id}`)
     } catch (e: any) {

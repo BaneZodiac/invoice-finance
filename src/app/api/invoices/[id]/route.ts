@@ -90,7 +90,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     return Response.json(updated);
   } catch (error) {
-    return Response.json({ error: "Failed to update invoice" }, { status: 500 });
+    const detail = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: "Failed to update invoice", detail }, { status: 500 });
   }
 }
 
