@@ -28,34 +28,36 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
     const { items, ...quotationData } = body;
 
-    let subtotal = quotationData.subtotal || 0;
-    if (items && items.length > 0) {
-      subtotal = items.reduce((sum: number, item: { quantity: number; unitPrice: number; amount?: number }) => {
+    const updateData: Record<string, unknown> = {};
+
+    if (quotationData.number !== undefined) updateData.number = quotationData.number;
+    if (quotationData.status !== undefined) updateData.status = quotationData.status;
+    if (quotationData.issueDate) updateData.issueDate = new Date(quotationData.issueDate);
+    if (quotationData.validUntil) updateData.validUntil = new Date(quotationData.validUntil);
+    else if (quotationData.dueDate) updateData.validUntil = new Date(quotationData.dueDate);
+    if (quotationData.notes !== undefined) updateData.notes = quotationData.notes;
+    if (quotationData.terms !== undefined) updateData.terms = quotationData.terms;
+    if (quotationData.companyId !== undefined) updateData.companyId = quotationData.companyId;
+    if (quotationData.clientId !== undefined) updateData.clientId = quotationData.clientId;
+
+    if (items !== undefined) {
+      let subtotal = items.reduce((sum: number, item: { quantity: number; unitPrice: number; amount?: number }) => {
         return sum + (item.amount || (item.quantity || 1) * (item.unitPrice || 0));
       }, 0);
+      const calculated = calculateInvoice(subtotal, quotationData.taxRate ?? 0, quotationData.discount ?? 0);
+      updateData.subtotal = calculated.subtotal;
+      updateData.taxRate = quotationData.taxRate ?? 0;
+      updateData.taxAmount = calculated.taxAmount;
+      updateData.discount = quotationData.discount ?? 0;
+      updateData.total = calculated.total;
     }
-    const calculated = calculateInvoice(subtotal, quotationData.taxRate || 0, quotationData.discount || 0);
 
     await prisma.quotation.update({
       where: { id },
-      data: {
-        number: quotationData.number,
-        status: quotationData.status,
-        issueDate: quotationData.issueDate ? new Date(quotationData.issueDate) : undefined,
-        validUntil: quotationData.validUntil ? new Date(quotationData.validUntil) : (quotationData.dueDate ? new Date(quotationData.dueDate) : undefined),
-        subtotal: calculated.subtotal,
-        taxRate: quotationData.taxRate || 0,
-        taxAmount: calculated.taxAmount,
-        discount: quotationData.discount || 0,
-        total: calculated.total,
-        notes: quotationData.notes,
-        terms: quotationData.terms,
-        companyId: quotationData.companyId,
-        clientId: quotationData.clientId,
-      },
+      data: updateData,
     });
 
-    if (items) {
+    if (items !== undefined) {
       await prisma.quotationItem.deleteMany({ where: { quotationId: id } });
       await prisma.quotationItem.createMany({
         data: items.map((item: { description: string; quantity: number; unitPrice: number }) => ({

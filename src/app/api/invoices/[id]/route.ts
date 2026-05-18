@@ -35,34 +35,35 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
     const { items, ...invoiceData } = body;
 
-    let subtotal = invoiceData.subtotal || 0;
-    if (items && items.length > 0) {
-      subtotal = items.reduce((sum: number, item: { quantity: number; unitPrice: number; amount?: number }) => {
+    const updateData: Record<string, unknown> = {};
+
+    if (invoiceData.number !== undefined) updateData.number = invoiceData.number;
+    if (invoiceData.status !== undefined) updateData.status = invoiceData.status;
+    if (invoiceData.type !== undefined) updateData.type = invoiceData.type;
+    if (invoiceData.issueDate) updateData.issueDate = new Date(invoiceData.issueDate);
+    if (invoiceData.dueDate) updateData.dueDate = new Date(invoiceData.dueDate);
+    if (invoiceData.paidAt) updateData.paidAt = new Date(invoiceData.paidAt);
+    if (invoiceData.notes !== undefined) updateData.notes = invoiceData.notes;
+    if (invoiceData.terms !== undefined) updateData.terms = invoiceData.terms;
+    if (invoiceData.companyId !== undefined) updateData.companyId = invoiceData.companyId;
+    if (invoiceData.clientId !== undefined) updateData.clientId = invoiceData.clientId;
+
+    if (items !== undefined) {
+      let subtotal = items.reduce((sum: number, item: { quantity: number; unitPrice: number; amount?: number }) => {
         return sum + (item.amount || (item.quantity || 1) * (item.unitPrice || 0));
       }, 0);
+      const calculated = calculateInvoice(subtotal, invoiceData.taxRate ?? 0, invoiceData.discount ?? 0);
+      updateData.subtotal = calculated.subtotal;
+      updateData.taxRate = invoiceData.taxRate ?? 0;
+      updateData.taxAmount = calculated.taxAmount;
+      updateData.discount = invoiceData.discount ?? 0;
+      updateData.total = calculated.total;
+      updateData.amountPaid = invoiceData.amountPaid ?? 0;
     }
-    const calculated = calculateInvoice(subtotal, invoiceData.taxRate || 0, invoiceData.discount || 0);
 
     const invoice = await prisma.invoice.update({
       where: { id },
-      data: {
-        number: invoiceData.number,
-        status: invoiceData.status,
-        type: invoiceData.type,
-        issueDate: invoiceData.issueDate ? new Date(invoiceData.issueDate) : undefined,
-        dueDate: invoiceData.dueDate ? new Date(invoiceData.dueDate) : undefined,
-        paidAt: invoiceData.paidAt ? new Date(invoiceData.paidAt) : undefined,
-        subtotal: calculated.subtotal,
-        taxRate: invoiceData.taxRate || 0,
-        taxAmount: calculated.taxAmount,
-        discount: invoiceData.discount || 0,
-        total: calculated.total,
-        amountPaid: invoiceData.amountPaid || 0,
-        notes: invoiceData.notes,
-        terms: invoiceData.terms,
-        companyId: invoiceData.companyId,
-        clientId: invoiceData.clientId,
-      },
+      data: updateData,
       include: {
         client: true,
         company: true,
