@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
     const client = await prisma.client.create({ data: body });
     return Response.json(client, { status: 201 });
   } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    return Response.json({ error: "Failed to create client", detail }, { status: 500 });
+    return Response.json({ error: "Failed to create client" }, { status: 500 });
   }
 }
