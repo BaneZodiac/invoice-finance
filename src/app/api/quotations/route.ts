@@ -28,8 +28,16 @@ export async function POST(req: NextRequest) {
       if (company) quotationData.companyId = company.id;
     }
 
+    const lineItems = items?.map((item: { description: string; quantity: number; unitPrice: number }) => ({
+      description: item.description,
+      quantity: item.quantity || 1,
+      unitPrice: item.unitPrice || 0,
+      amount: (item.quantity || 1) * (item.unitPrice || 0),
+    })) || [];
+
+    const subtotal = lineItems.reduce((sum: number, item: { amount: number }) => sum + item.amount, 0);
     const calculated = calculateInvoice(
-      quotationData.subtotal || 0,
+      subtotal,
       quotationData.taxRate || 0,
       quotationData.discount || 0
     );
@@ -49,14 +57,7 @@ export async function POST(req: NextRequest) {
         terms: quotationData.terms || "",
         companyId: quotationData.companyId,
         clientId: quotationData.clientId,
-        items: {
-          create: items?.map((item: { description: string; quantity: number; unitPrice: number }) => ({
-            description: item.description,
-            quantity: item.quantity || 1,
-            unitPrice: item.unitPrice || 0,
-            amount: (item.quantity || 1) * (item.unitPrice || 0),
-          })) || [],
-        },
+        items: { create: lineItems },
       },
       include: {
         client: true,

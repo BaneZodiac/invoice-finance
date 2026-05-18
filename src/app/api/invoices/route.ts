@@ -63,8 +63,16 @@ export async function POST(req: NextRequest) {
       if (company) invoiceData.companyId = company.id;
     }
 
+    const lineItems = items?.map((item: { description: string; quantity: number; unitPrice: number }) => ({
+      description: item.description,
+      quantity: item.quantity || 1,
+      unitPrice: item.unitPrice || 0,
+      amount: (item.quantity || 1) * (item.unitPrice || 0),
+    })) || [];
+
+    const subtotal = lineItems.reduce((sum: number, item: { amount: number }) => sum + item.amount, 0);
     const calculated = calculateInvoice(
-      invoiceData.subtotal || 0,
+      subtotal,
       invoiceData.taxRate || 0,
       invoiceData.discount || 0
     );
@@ -86,14 +94,7 @@ export async function POST(req: NextRequest) {
         terms: invoiceData.terms || "",
         companyId: invoiceData.companyId,
         clientId: invoiceData.clientId,
-        items: {
-          create: items?.map((item: { description: string; quantity: number; unitPrice: number }) => ({
-            description: item.description,
-            quantity: item.quantity || 1,
-            unitPrice: item.unitPrice || 0,
-            amount: (item.quantity || 1) * (item.unitPrice || 0),
-          })) || [],
-        },
+        items: { create: lineItems },
       },
       include: {
         client: true,
