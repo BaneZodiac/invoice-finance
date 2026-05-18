@@ -5,8 +5,25 @@ export async function GET() {
   try {
     const clients = await prisma.client.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        _count: { select: { invoices: true } },
+      },
     });
-    return Response.json(clients);
+
+    const clientsWithTotals = await Promise.all(
+      clients.map(async (client) => {
+        const result = await prisma.invoice.aggregate({
+          where: { clientId: client.id },
+          _sum: { total: true },
+        });
+        return {
+          ...client,
+          totalBilled: result._sum.total || 0,
+        };
+      })
+    );
+
+    return Response.json(clientsWithTotals);
   } catch (error) {
     return Response.json({ error: "Failed to fetch clients" }, { status: 500 });
   }

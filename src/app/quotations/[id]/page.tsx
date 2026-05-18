@@ -18,7 +18,7 @@ type Quotation = {
   taxAmount: number
   total: number
   client: { id: string; name: string; email: string; address: string | null; phone: string | null }
-  items: { id: string; description: string; quantity: number; unitPrice: number; total: number }[]
+  items: { id: string; description: string; quantity: number; unitPrice: number; amount: number }[]
 }
 
 export default function QuotationDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -42,11 +42,12 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
 
   const handleAction = async (action: string) => {
     setActionLoading(action)
+    const statusMap: Record<string, string> = { send: "sent", accept: "accepted", reject: "rejected" }
     try {
       const res = await fetch(`/api/quotations/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ status: statusMap[action] || action }),
       })
       if (res.ok) {
         const updated = await res.json()
@@ -129,12 +130,19 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
               Edit
             </Link>
             <button
-              onClick={() => {
-                if (confirm("Delete this quotation?")) handleAction("delete")
+              onClick={async () => {
+                if (!confirm("Delete this quotation?")) return
+                setActionLoading("delete")
+                try {
+                  const res = await fetch(`/api/quotations/${id}`, { method: "DELETE" })
+                  if (res.ok) router.push("/quotations")
+                } catch {}
+                setActionLoading("")
               }}
-              className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+              disabled={actionLoading === "delete"}
+              className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
             >
-              <Trash2 className="h-4 w-4" />
+              {actionLoading === "delete" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               Delete
             </button>
           </div>
@@ -177,7 +185,7 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
                   <td className="py-4 text-sm text-gray-900">{item.description}</td>
                   <td className="py-4 text-sm text-gray-600">{item.quantity}</td>
                   <td className="py-4 text-right text-sm text-gray-600">{formatCurrency(item.unitPrice)}</td>
-                  <td className="py-4 text-right text-sm font-medium text-gray-900">{formatCurrency(item.total)}</td>
+                  <td className="py-4 text-right text-sm font-medium text-gray-900">{formatCurrency(item.amount)}</td>
                 </tr>
               ))}
             </tbody>

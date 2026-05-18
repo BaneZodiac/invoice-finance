@@ -151,7 +151,7 @@ export default function InvoicesPage() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
-                              window.open(`/api/invoices/${inv.id}/pdf`, "_blank")
+                              window.print()
                             }}
                             className="rounded p-1 text-gray-400 hover:text-gray-600"
                           >

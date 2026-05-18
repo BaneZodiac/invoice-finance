@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Download, Send, Edit, Trash2, Printer, Loader2 } from "lucide-react"
+import { ArrowLeft, Download, Send, Edit, Trash2, Loader2 } from "lucide-react"
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils"
 import InvoicePDF from "@/components/invoice/invoice-pdf"
 
@@ -20,7 +20,7 @@ type Invoice = {
   taxAmount: number
   total: number
   client: { id: string; name: string; email: string; address: string | null; phone: string | null }
-  items: { id: string; description: string; quantity: number; unitPrice: number; total: number }[]
+  items: { id: string; description: string; quantity: number; unitPrice: number; amount: number }[]
 }
 
 export default function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -42,18 +42,28 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       .finally(() => setLoading(false))
   }, [id])
 
-  const handleAction = async (action: string, method = "PATCH") => {
+  const handleAction = async (action: string) => {
     setActionLoading(action)
+    const statusMap: Record<string, string> = { send: "sent", "mark-paid": "paid" }
     try {
-      const res = await fetch(`/api/invoices/${id}`, {
-        method,
+      const res = await fetch(`/api/invoices/${id}/status`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ status: statusMap[action] || action }),
       })
       if (res.ok) {
         const updated = await res.json()
         setInvoice(updated)
       }
+    } catch {}
+    setActionLoading("")
+  }
+
+  const handleDelete = async () => {
+    setActionLoading("delete")
+    try {
+      const res = await fetch(`/api/invoices/${id}`, { method: "DELETE" })
+      if (res.ok) router.push("/invoices")
     } catch {}
     setActionLoading("")
   }
@@ -112,15 +122,11 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               </button>
             )}
             <button
-              onClick={() => window.open(`/api/invoices/${id}/pdf`, "_blank")}
+              onClick={() => window.print()}
               className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               <Download className="h-4 w-4" />
-              PDF
-            </button>
-            <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-              <Printer className="h-4 w-4" />
-              Print
+              Print / PDF
             </button>
             <Link
               href={`/invoices/${id}/edit`}
@@ -131,11 +137,12 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
             </Link>
             <button
               onClick={() => {
-                if (confirm("Delete this invoice?")) handleAction("delete", "DELETE")
+                if (confirm("Delete this invoice?")) handleDelete()
               }}
-              className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+              disabled={actionLoading === "delete"}
+              className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
             >
-              <Trash2 className="h-4 w-4" />
+              {actionLoading === "delete" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               Delete
             </button>
           </div>
@@ -181,7 +188,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
                       <td className="py-4 text-sm text-gray-900">{item.description}</td>
                       <td className="py-4 text-sm text-gray-600">{item.quantity}</td>
                       <td className="py-4 text-right text-sm text-gray-600">{formatCurrency(item.unitPrice)}</td>
-                      <td className="py-4 text-right text-sm font-medium text-gray-900">{formatCurrency(item.total)}</td>
+                      <td className="py-4 text-right text-sm font-medium text-gray-900">{formatCurrency(item.amount)}</td>
                     </tr>
                   ))}
                 </tbody>

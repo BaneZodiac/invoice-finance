@@ -35,11 +35,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
     const { items, ...invoiceData } = body;
 
-    const calculated = calculateInvoice(
-      invoiceData.subtotal || 0,
-      invoiceData.taxRate || 0,
-      invoiceData.discount || 0
-    );
+    let subtotal = invoiceData.subtotal || 0;
+    if (items && items.length > 0) {
+      subtotal = items.reduce((sum: number, item: { quantity: number; unitPrice: number; amount?: number }) => {
+        return sum + (item.amount || (item.quantity || 1) * (item.unitPrice || 0));
+      }, 0);
+    }
+    const calculated = calculateInvoice(subtotal, invoiceData.taxRate || 0, invoiceData.discount || 0);
 
     const invoice = await prisma.invoice.update({
       where: { id },

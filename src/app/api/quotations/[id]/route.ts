@@ -28,11 +28,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
     const { items, ...quotationData } = body;
 
-    const calculated = calculateInvoice(
-      quotationData.subtotal || 0,
-      quotationData.taxRate || 0,
-      quotationData.discount || 0
-    );
+    let subtotal = quotationData.subtotal || 0;
+    if (items && items.length > 0) {
+      subtotal = items.reduce((sum: number, item: { quantity: number; unitPrice: number; amount?: number }) => {
+        return sum + (item.amount || (item.quantity || 1) * (item.unitPrice || 0));
+      }, 0);
+    }
+    const calculated = calculateInvoice(subtotal, quotationData.taxRate || 0, quotationData.discount || 0);
 
     await prisma.quotation.update({
       where: { id },

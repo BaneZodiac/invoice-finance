@@ -8,12 +8,30 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       where: { id },
       include: {
         _count: { select: { invoices: true, quotations: true } },
+        invoices: {
+          orderBy: { createdAt: "desc" },
+          select: { id: true, number: true, status: true, issueDate: true, total: true },
+        },
       },
     });
     if (!client) {
       return Response.json({ error: "Client not found" }, { status: 404 });
     }
-    return Response.json(client);
+
+    const billed = await prisma.invoice.aggregate({
+      where: { clientId: id, status: "paid" },
+      _sum: { total: true },
+    });
+    const outstanding = await prisma.invoice.aggregate({
+      where: { clientId: id, status: { in: ["sent", "overdue"] } },
+      _sum: { total: true },
+    });
+
+    return Response.json({
+      ...client,
+      totalBilled: billed._sum.total || 0,
+      totalOutstanding: outstanding._sum.total || 0,
+    });
   } catch (error) {
     return Response.json({ error: "Failed to fetch client" }, { status: 500 });
   }
