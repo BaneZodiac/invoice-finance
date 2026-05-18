@@ -48,7 +48,8 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    return Response.json({ error: "Failed to fetch invoices" }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: "Failed to fetch invoices", detail: message }, { status: 500 });
   }
 }
 
@@ -98,6 +99,7 @@ export async function POST(req: NextRequest) {
 
     return Response.json(invoice, { status: 201 });
   } catch (error) {
-    return Response.json({ error: "Failed to create invoice" }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: "Failed to create invoice", detail: message }, { status: 500 });
   }
 }
