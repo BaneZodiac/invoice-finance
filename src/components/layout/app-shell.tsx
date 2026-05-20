@@ -20,7 +20,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen">
       <Sidebar mobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} />
       <main className="flex-1 overflow-auto min-w-0">
-        <div className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 lg:hidden">
+        <div className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 mobile-only">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="text-sm font-semibold text-gray-900">Nomads Finance</span>
           </div>
         </div>
-        <div className="p-4 lg:p-8">
+        <div className="p-4">
           {children}
         </div>
       </main>

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../../components";
+@source "../../app";
 
 :root {
   --background: #f8fafc;
@@ -24,4 +26,14 @@ body {
 @media print {
   .no-print { display: none !important; }
   body { background: white; }
+}
+
+@media (max-width: 1023px) {
+  .mobile-only { display: revert; }
+  .desktop-only { display: none !important; }
+}
+
+@media (min-width: 1024px) {
+  .mobile-only { display: none !important; }
+  .desktop-only { display: revert; }
 }

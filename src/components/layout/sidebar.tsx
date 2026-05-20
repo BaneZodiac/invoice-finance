@@ -109,30 +109,22 @@ const Sidebar: React.FC<SidebarProps> = ({ className, mobileOpen, onMobileClose 
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 mobile-only"
           onClick={onMobileClose}
         />
       )}
 
       {/* Desktop sidebar */}
-      <aside
-        className={cn(
-          "w-64 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0 hidden lg:flex",
-          className
-        )}
-      >
+      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0 desktop-only">
         {content}
       </aside>
 
       {/* Mobile sidebar */}
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col lg:hidden",
-          mobileOpen ? "block" : "hidden"
-        )}
-      >
-        {content}
-      </aside>
+      {mobileOpen && (
+        <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col mobile-only">
+          {content}
+        </aside>
+      )}
     </>
   );
 };
