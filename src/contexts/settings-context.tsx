@@ -11,6 +11,7 @@ type Settings = {
   gst: string;
   website: string;
   mobile: string;
+  upiId: string;
   logo: string | null;
   taxRate: number;
   currency: string;
@@ -33,6 +34,7 @@ const defaultSettings: Settings = {
   gst: "",
   website: "",
   mobile: "",
+  upiId: "",
   logo: null,
   taxRate: 0,
   currency: "USD",

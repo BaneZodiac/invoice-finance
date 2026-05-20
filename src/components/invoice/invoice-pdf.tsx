@@ -19,6 +19,7 @@ interface CompanyInfo {
   gst?: string;
   website?: string;
   mobile?: string;
+  upiId?: string;
 }
 
 interface ClientInfo {
@@ -267,6 +268,11 @@ function InvoicePdf(props: InvoicePdfProps) {
                         {props.company?.phone && (
                           <div style={{ fontSize: "12px", color: "#6b7280" }}>
                             {props.company.phone}
+                          </div>
+                        )}
+                        {props.company?.upiId && (
+                          <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                            UPI: {props.company.upiId}
                           </div>
                         )}
                         {props.company?.address && (

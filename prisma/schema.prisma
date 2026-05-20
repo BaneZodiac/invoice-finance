@@ -21,6 +21,7 @@ model Company {
   gst         String   @default("")
   website     String   @default("")
   mobile      String   @default("")
+  upiId       String   @default("")
   logo        String   @default("")
   currency    String   @default("USD")
   invoiceNote String   @default("")

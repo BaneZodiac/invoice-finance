@@ -11,6 +11,7 @@ type Settings = {
   gst: string
   website: string
   mobile: string
+  upiId: string
   logo: string | null
   taxRate: number
   currency: string
@@ -28,6 +29,7 @@ const defaultSettings: Settings = {
   gst: "",
   website: "",
   mobile: "",
+  upiId: "",
   logo: null,
   taxRate: 0,
   currency: "USD",
@@ -198,6 +200,16 @@ export default function SettingsPage() {
                   type="text"
                   value={settings.mobile}
                   onChange={(e) => setSettings({ ...settings, mobile: e.target.value })}
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">UPI ID</label>
+                <input
+                  type="text"
+                  value={settings.upiId}
+                  onChange={(e) => setSettings({ ...settings, upiId: e.target.value })}
+                  placeholder="example@upi"
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
                 />
               </div>

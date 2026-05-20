@@ -254,9 +254,10 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
                   <p className="mt-2 text-sm font-medium text-gray-900">{settings?.companyName || "Nomads Finance"}</p>
                   {settings?.gst && <p className="mt-1 text-sm text-gray-600">GST: {settings.gst}</p>}
                   {settings?.companyEmail && <p className="mt-1 text-sm text-gray-600">{settings.companyEmail}</p>}
-                  {settings?.mobile && <p className="text-sm text-gray-600">{settings.mobile}</p>}
-                  {settings?.companyPhone && <p className="text-sm text-gray-600">{settings.companyPhone}</p>}
-                  {settings?.website && <p className="text-sm text-gray-600">{settings.website}</p>}
+              {settings?.mobile && <p className="text-sm text-gray-600">{settings.mobile}</p>}
+              {settings?.companyPhone && <p className="text-sm text-gray-600">{settings.companyPhone}</p>}
+              {settings?.website && <p className="text-sm text-gray-600">{settings.website}</p>}
+              {settings?.upiId && <p className="text-sm text-gray-600">UPI: {settings.upiId}</p>}
                   {settings?.companyAddress && <p className="text-sm text-gray-600">{settings.companyAddress}</p>}
                 </div>
                 <div>
@@ -339,6 +340,7 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
                     email: settings?.companyEmail || undefined,
                     phone: settings?.companyPhone || undefined,
                     mobile: settings?.mobile || undefined,
+                    upiId: settings?.upiId || undefined,
                     gst: settings?.gst || undefined,
                     website: settings?.website || undefined,
                     address: settings?.companyAddress || undefined,

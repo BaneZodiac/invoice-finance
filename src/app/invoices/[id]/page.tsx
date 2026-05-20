@@ -321,6 +321,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
                   email: settings?.companyEmail || undefined,
                   phone: settings?.companyPhone || undefined,
                   mobile: settings?.mobile || undefined,
+                  upiId: settings?.upiId || undefined,
                   gst: settings?.gst || undefined,
                   website: settings?.website || undefined,
                   address: settings?.companyAddress || undefined,

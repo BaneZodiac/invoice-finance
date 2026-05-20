@@ -9,7 +9,7 @@ async function getOrCreateCompany() {
   return company;
 }
 
-function toSettings(company: { name: string; email: string; phone: string; address: string; gst: string; website: string; mobile: string; logo: string; taxRate: number; currency: string; invoicePrefix: string; quotationPrefix: string; defaultPaymentTerms: number; defaultDueDays: number }) {
+function toSettings(company: { name: string; email: string; phone: string; address: string; gst: string; website: string; mobile: string; upiId: string; logo: string; taxRate: number; currency: string; invoicePrefix: string; quotationPrefix: string; defaultPaymentTerms: number; defaultDueDays: number }) {
   return {
     companyName: company.name,
     companyEmail: company.email,
@@ -18,6 +18,7 @@ function toSettings(company: { name: string; email: string; phone: string; addre
     gst: company.gst,
     website: company.website,
     mobile: company.mobile,
+    upiId: company.upiId,
     logo: company.logo,
     taxRate: company.taxRate,
     currency: company.currency,
@@ -51,6 +52,7 @@ export async function PUT(req: NextRequest) {
           gst: body.gst || "",
           website: body.website || "",
           mobile: body.mobile || "",
+          upiId: body.upiId || "",
           logo: body.logo || "",
           taxRate: body.taxRate ?? 0,
           currency: body.currency || "USD",
@@ -71,6 +73,7 @@ export async function PUT(req: NextRequest) {
           gst: body.gst,
           website: body.website,
           mobile: body.mobile,
+          upiId: body.upiId,
           logo: body.logo,
           taxRate: body.taxRate,
           currency: body.currency,
