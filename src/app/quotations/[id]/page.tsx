@@ -114,9 +114,43 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
               <ArrowLeft className="h-5 w-5" />
             </button>
             <h1 className="text-2xl font-semibold text-gray-900">{quotation.number}</h1>
-            <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(quotation.status)}`}>
-              {quotation.status}
-            </span>
+            <div className="relative">
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(quotation.status)}`}>
+                {quotation.status}
+              </span>
+              <select
+                value={quotation.status}
+                onChange={async (e) => {
+                  const newStatus = e.target.value
+                  setActionLoading("status")
+                  setError("")
+                  try {
+                    const res = await fetch(`/api/quotations/${id}`, {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ status: newStatus }),
+                    })
+                    if (res.ok) {
+                      const updated = await res.json()
+                      setQuotation(updated)
+                    } else {
+                      const err = await res.json()
+                      setError(err.error || err.message || "Failed to update status")
+                    }
+                  } catch {
+                    setError("Failed to update status")
+                  }
+                  setActionLoading("")
+                }}
+                className="absolute inset-0 cursor-pointer opacity-0"
+              >
+                <option value="draft">draft</option>
+                <option value="sent">sent</option>
+                <option value="accepted">accepted</option>
+                <option value="rejected">rejected</option>
+                <option value="expired">expired</option>
+              </select>
+            </div>
           </div>
           <div className="flex items-center gap-2 no-print">
             {quotation.status === "draft" && (

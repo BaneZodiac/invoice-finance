@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Download, Send, Edit, Trash2, Loader2 } from "lucide-react"
+import { ArrowLeft, Download, Send, Edit, Trash2, Loader2, Check } from "lucide-react"
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils"
 import { useSettings } from "@/contexts/settings-context"
 import InvoicePDF from "@/components/invoice/invoice-pdf"
@@ -113,9 +113,43 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               <ArrowLeft className="h-5 w-5" />
             </button>
             <h1 className="text-2xl font-semibold text-gray-900">{invoice.number}</h1>
-            <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(invoice.status)}`}>
-              {invoice.status}
-            </span>
+            <div className="relative">
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(invoice.status)}`}>
+                {invoice.status}
+              </span>
+              <select
+                value={invoice.status}
+                onChange={async (e) => {
+                  const newStatus = e.target.value
+                  setActionLoading("status")
+                  setError("")
+                  try {
+                    const res = await fetch(`/api/invoices/${id}/status`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ status: newStatus }),
+                    })
+                    if (res.ok) {
+                      const updated = await res.json()
+                      setInvoice(updated)
+                    } else {
+                      const err = await res.json()
+                      setError(err.error || err.message || "Failed to update status")
+                    }
+                  } catch {
+                    setError("Failed to update status")
+                  }
+                  setActionLoading("")
+                }}
+                className="absolute inset-0 cursor-pointer opacity-0"
+              >
+                <option value="draft">draft</option>
+                <option value="sent">sent</option>
+                <option value="paid">paid</option>
+                <option value="overdue">overdue</option>
+                <option value="cancelled">cancelled</option>
+              </select>
+            </div>
           </div>
           <div className="flex items-center gap-2 no-print">
             {invoice.status === "draft" && (
