@@ -41,13 +41,22 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await req.json();
+    if (body.name) {
+      const existing = await prisma.client.findFirst({
+        where: { name: { equals: body.name }, id: { not: id } },
+      });
+      if (existing) {
+        return Response.json({ error: "A client with this name already exists" }, { status: 409 });
+      }
+    }
     const client = await prisma.client.update({
       where: { id },
       data: body,
     });
     return Response.json(client);
   } catch (error) {
-    return Response.json({ error: "Failed to update client" }, { status: 500 });
+    const detail = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: "Failed to update client", detail }, { status: 500 });
   }
 }
 

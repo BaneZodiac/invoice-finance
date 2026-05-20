@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Plus, Search, Mail, Phone, MapPin, Loader2 } from "lucide-react"
+import { Plus, Search, Mail, Phone, MapPin, Loader2, GitMerge } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 
 type Client = {
@@ -22,6 +22,8 @@ export default function ClientsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [search, setSearch] = useState("")
+  const [dedupMsg, setDedupMsg] = useState("")
+  const [deduping, setDeduping] = useState(false)
 
   const fetchClients = useCallback(async () => {
     setLoading(true)
@@ -39,6 +41,24 @@ export default function ClientsPage() {
     }
   }, [search])
 
+  const handleDedup = async () => {
+    setDeduping(true)
+    setDedupMsg("")
+    try {
+      const res = await fetch("/api/clients/dedup", { method: "POST" })
+      const data = await res.json()
+      if (data.count > 0) {
+        setDedupMsg(`Merged ${data.count} duplicate(s): ${data.deleted.join(", ")}`)
+        fetchClients()
+      } else {
+        setDedupMsg("No duplicates found.")
+      }
+    } catch {
+      setDedupMsg("Failed to deduplicate.")
+    }
+    setDeduping(false)
+  }
+
   useEffect(() => { fetchClients() }, [fetchClients])
 
   return (
@@ -46,14 +66,28 @@ export default function ClientsPage() {
       <div className="flex-1 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold text-gray-900">Clients</h1>
-          <Link
-            href="/clients/new"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4" />
-            New Client
-          </Link>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDedup}
+              disabled={deduping}
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            >
+              {deduping ? <Loader2 className="h-4 w-4 animate-spin" /> : <GitMerge className="h-4 w-4" />}
+              Merge Duplicates
+            </button>
+            <Link
+              href="/clients/new"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4" />
+              New Client
+            </Link>
+          </div>
         </div>
+
+        {dedupMsg && (
+          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{dedupMsg}</div>
+        )}
 
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />

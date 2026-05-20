@@ -66,6 +66,7 @@ model Invoice {
   taxRate      Float       @default(0)
   taxAmount    Float       @default(0)
   discount     Float       @default(0)
+  discountType String      @default("percentage") // percentage | fixed
   total        Float       @default(0)
   amountPaid   Float       @default(0)
   notes        String      @default("")
@@ -101,6 +102,7 @@ model Quotation {
   taxRate   Float          @default(0)
   taxAmount Float          @default(0)
   discount  Float          @default(0)
+  discountType String      @default("percentage") // percentage | fixed
   total     Float          @default(0)
   notes     String         @default("")
   terms     String         @default("")

@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 import { Printer, Download } from "lucide-react";
+import { getDefaultCurrency } from "@/lib/utils";
 
 interface CompanyInfo {
   name: string;
@@ -47,6 +48,7 @@ interface InvoiceData {
   taxAmount: number;
   discount?: number;
   discountAmount?: number;
+  discountType?: string;
   total: number;
   client: {
     name: string;
@@ -76,6 +78,7 @@ interface InvoicePdfProps {
   taxAmount?: number;
   discount?: number;
   discountAmount?: number;
+  discountType?: string;
   total?: number;
   notes?: string;
   terms?: string;
@@ -115,7 +118,11 @@ function InvoicePdf(props: InvoicePdfProps) {
   const invoiceDiscount = props.discount ?? data?.discount ?? 0;
   const invoiceDiscountAmount = props.discountAmount ?? data?.discountAmount ?? 0;
   const invoiceTotal = props.total ?? data?.total ?? 0;
-  const currency = props.currency || "USD";
+  const currency = props.currency || getDefaultCurrency();
+
+  const companyInfo = props.company;
+  const companyName = companyInfo?.name || "Nomads Finance";
+  const companyLogo = companyInfo?.logo || "";
 
   const clientInfo = props.client ?? data?.client;
   const clientName = clientInfo?.name ?? "";
@@ -206,22 +213,27 @@ function InvoicePdf(props: InvoicePdfProps) {
                   <tbody>
                     <tr>
                       <td style={{ verticalAlign: "top" }}>
-                        <div style={{ fontSize: "14px", fontWeight: "700", color: "#111827" }}>
-                          FinanceFlow
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                          {companyLogo && (
+                            <img src={companyLogo} alt="" style={{ height: "32px", width: "32px", objectFit: "contain", borderRadius: "4px" }} />
+                          )}
+                          <div style={{ fontSize: "14px", fontWeight: "700", color: "#111827" }}>
+                            {companyName}
+                          </div>
                         </div>
-                        {clientAddress && (
-                          <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "2px" }}>
-                            {clientAddress}
-                          </div>
-                        )}
-                        {clientEmail && (
+                        {props.company?.email && (
                           <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>
-                            {clientEmail}
+                            {props.company.email}
                           </div>
                         )}
-                        {clientPhone && (
+                        {props.company?.phone && (
                           <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                            {clientPhone}
+                            {props.company.phone}
+                          </div>
+                        )}
+                        {props.company?.address && (
+                          <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                            {props.company.address}
                           </div>
                         )}
                       </td>
@@ -498,7 +510,7 @@ function InvoicePdf(props: InvoicePdfProps) {
                                     textAlign: "right",
                                   }}
                                 >
-                                  Discount ({invoiceDiscount}%)
+                                  Discount {data?.discountType === "fixed" ? `($${invoiceDiscount.toFixed(2)})` : `(${invoiceDiscount}%)`}
                                 </td>
                                 <td
                                   style={{

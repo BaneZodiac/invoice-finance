@@ -40,7 +40,8 @@ export async function POST(req: NextRequest) {
     const calculated = calculateInvoice(
       subtotal,
       quotationData.taxRate || 0,
-      quotationData.discount || 0
+      quotationData.discount || 0,
+      quotationData.discountType || "percentage"
     );
 
     const quotation = await prisma.quotation.create({
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
         taxRate: quotationData.taxRate || 0,
         taxAmount: calculated.taxAmount,
         discount: quotationData.discount || 0,
+        discountType: quotationData.discountType || "percentage",
         total: calculated.total,
         notes: quotationData.notes || "",
         terms: quotationData.terms || "",

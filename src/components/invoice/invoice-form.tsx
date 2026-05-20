@@ -28,6 +28,7 @@ interface InvoiceFormData {
   items: LineItem[];
   taxRate: number;
   discount: number;
+  discountType: string;
   notes: string;
   terms: string;
   status: string;
@@ -80,6 +81,7 @@ function InvoiceForm({
     ],
     taxRate: initialData?.taxRate ?? 0,
     discount: initialData?.discount ?? 0,
+    discountType: initialData?.discountType || "percentage",
     notes: initialData?.notes || "",
     terms: initialData?.terms || "",
     status: initialData?.status || "draft",
@@ -132,7 +134,7 @@ function InvoiceForm({
   };
 
   const subtotal = formData.items.reduce((sum, item) => sum + item.amount, 0);
-  const discountAmount = subtotal * (formData.discount / 100);
+  const discountAmount = formData.discountType === "fixed" ? formData.discount : subtotal * (formData.discount / 100);
   const taxableAmount = subtotal - discountAmount;
   const taxAmount = taxableAmount * (formData.taxRate / 100);
   const total = taxableAmount + taxAmount;
@@ -347,17 +349,35 @@ function InvoiceForm({
                 updateField("taxRate", Number(e.target.value))
               }
             />
-            <Input
-              label="Discount (%)"
-              type="number"
-              min="0"
-              max="100"
-              step="0.1"
-              value={formData.discount}
-              onChange={(e) =>
-                updateField("discount", Number(e.target.value))
-              }
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
+              <div className="flex gap-2 mb-2">
+                <button
+                  type="button"
+                  onClick={() => updateField("discountType", "percentage")}
+                  className={`flex-1 rounded-md px-2 py-1 text-xs font-medium ${formData.discountType === "percentage" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                >
+                  %
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateField("discountType", "fixed")}
+                  className={`flex-1 rounded-md px-2 py-1 text-xs font-medium ${formData.discountType === "fixed" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                >
+                  $
+                </button>
+              </div>
+              <Input
+                label={formData.discountType === "fixed" ? "Discount Amount ($)" : "Discount (%)"}
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.discount}
+                onChange={(e) =>
+                  updateField("discount", Number(e.target.value))
+                }
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -373,7 +393,7 @@ function InvoiceForm({
               </div>
               {formData.discount > 0 && (
                 <div className="flex justify-between text-red-600">
-                  <span>Discount ({formData.discount}%)</span>
+                  <span>Discount {formData.discountType === "fixed" ? `($${formData.discount.toFixed(2)})` : `(${formData.discount}%)`}</span>
                   <span>-${discountAmount.toFixed(2)}</span>
                 </div>
               )}

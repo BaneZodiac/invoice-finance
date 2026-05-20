@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Download, Send, Edit, Trash2, Loader2 } from "lucide-react"
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils"
+import { useSettings } from "@/contexts/settings-context"
 import InvoicePDF from "@/components/invoice/invoice-pdf"
 
 type Invoice = {
@@ -18,6 +19,8 @@ type Invoice = {
   subtotal: number
   taxRate: number
   taxAmount: number
+  discount: number
+  discountType: string
   total: number
   client: { id: string; name: string; email: string; address: string | null; phone: string | null }
   items: { id: string; description: string; quantity: number; unitPrice: number; amount: number }[]
@@ -26,6 +29,7 @@ type Invoice = {
 export default function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
+  const { settings } = useSettings()
   const [invoice, setInvoice] = useState<Invoice | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -219,6 +223,12 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
                     <span className="text-gray-600">Subtotal</span>
                     <span className="text-gray-900">{formatCurrency(invoice.subtotal)}</span>
                   </div>
+                  {invoice.discount > 0 && (
+                    <div className="flex justify-between text-sm text-red-600">
+                      <span>Discount {invoice.discountType === "fixed" ? `($${invoice.discount.toFixed(2)})` : `(${invoice.discount}%)`}</span>
+                      <span>-{formatCurrency(invoice.discountType === "fixed" ? invoice.discount : invoice.subtotal * (invoice.discount / 100))}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Tax ({invoice.taxRate}%)</span>
                     <span className="text-gray-900">{formatCurrency(invoice.taxAmount)}</span>
@@ -242,7 +252,18 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           <div className="space-y-4 no-print">
             <div className="rounded-xl border border-gray-200 bg-white p-6">
               <div className="space-y-2">
-                <InvoicePDF invoice={{ ...invoice, notes: invoice.notes ?? undefined, client: { ...invoice.client, address: invoice.client.address ?? undefined, phone: invoice.client.phone ?? undefined } }} />
+                <InvoicePDF invoice={{
+                  ...invoice,
+                  notes: invoice.notes ?? undefined,
+                  client: { ...invoice.client, address: invoice.client.address ?? undefined, phone: invoice.client.phone ?? undefined },
+                  discountType: invoice.discountType,
+                }} company={{
+                  name: settings?.companyName || "Nomads Finance",
+                  logo: settings?.logo || undefined,
+                  email: settings?.companyEmail || undefined,
+                  phone: settings?.companyPhone || undefined,
+                  address: settings?.companyAddress || undefined,
+                }} />
               </div>
             </div>
           </div>

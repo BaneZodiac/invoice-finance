@@ -12,8 +12,23 @@ export function generateQuotationNumber(): string {
   return `QTN-${year}-${random}`;
 }
 
-export function calculateInvoice(subtotal: number, taxRate: number, discount: number) {
-  const discountAmount = subtotal * (discount / 100);
+let _defaultCurrency = "USD";
+
+export function setDefaultCurrency(c: string) {
+  _defaultCurrency = c;
+}
+
+export function getDefaultCurrency() {
+  return _defaultCurrency;
+}
+
+export function calculateInvoice(subtotal: number, taxRate: number, discount: number, discountType = "percentage") {
+  let discountAmount = 0;
+  if (discountType === "fixed") {
+    discountAmount = discount;
+  } else {
+    discountAmount = subtotal * (discount / 100);
+  }
   const taxableAmount = subtotal - discountAmount;
   const taxAmount = taxableAmount * (taxRate / 100);
   const total = taxableAmount + taxAmount;
@@ -25,10 +40,11 @@ export function calculateInvoice(subtotal: number, taxRate: number, discount: nu
   };
 }
 
-export function formatCurrency(amount: number, currency = "USD"): string {
+export function formatCurrency(amount: number, currency?: string): string {
+  const c = currency || _defaultCurrency || "USD";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency,
+    currency: c,
   }).format(amount);
 }
 

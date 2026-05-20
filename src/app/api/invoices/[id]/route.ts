@@ -52,11 +52,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       let subtotal = items.reduce((sum: number, item: { quantity: unknown; unitPrice: unknown; amount?: unknown }) => {
         return sum + (Number(item.amount) || (Number(item.quantity) || 1) * (Number(item.unitPrice) || 0));
       }, 0);
-      const calculated = calculateInvoice(subtotal, invoiceData.taxRate ?? 0, invoiceData.discount ?? 0);
+      const calculated = calculateInvoice(subtotal, invoiceData.taxRate ?? 0, invoiceData.discount ?? 0, invoiceData.discountType || "percentage");
       updateData.subtotal = calculated.subtotal;
       updateData.taxRate = invoiceData.taxRate ?? 0;
       updateData.taxAmount = calculated.taxAmount;
       updateData.discount = invoiceData.discount ?? 0;
+      updateData.discountType = invoiceData.discountType || "percentage";
       updateData.total = calculated.total;
       updateData.amountPaid = invoiceData.amountPaid ?? 0;
     }

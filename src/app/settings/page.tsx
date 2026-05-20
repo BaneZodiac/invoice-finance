@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Loader2, Save, Building2, FileText, Percent, DollarSign } from "lucide-react"
+import { Loader2, Save, Building2, FileText, Percent, DollarSign, Upload } from "lucide-react"
 
 type Settings = {
   companyName: string
@@ -115,6 +115,40 @@ export default function SettingsPage() {
                   onChange={(e) => setSettings({ ...settings, companyName: e.target.value })}
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Company Logo</label>
+                <div className="mt-1 flex items-center gap-3">
+                  {settings.logo && (
+                    <img src={settings.logo} alt="Logo" className="h-10 w-10 rounded-lg object-contain border border-gray-200" />
+                  )}
+                  <label className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <Upload className="h-4 w-4" />
+                    {settings.logo ? "Change" : "Upload"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = () => setSettings({ ...settings, logo: reader.result as string });
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                  {settings.logo && (
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, logo: null })}
+                      className="text-sm text-red-600 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Email</label>

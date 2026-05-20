@@ -30,6 +30,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         taxRate: quotation.taxRate,
         taxAmount: quotation.taxAmount,
         discount: quotation.discount,
+        discountType: quotation.discountType || "percentage",
         total: quotation.total,
         amountPaid: 0,
         notes: quotation.notes,

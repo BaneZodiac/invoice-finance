@@ -74,7 +74,8 @@ export async function POST(req: NextRequest) {
     const calculated = calculateInvoice(
       subtotal,
       invoiceData.taxRate || 0,
-      invoiceData.discount || 0
+      invoiceData.discount || 0,
+      invoiceData.discountType || "percentage"
     );
 
     const invoice = await prisma.invoice.create({
@@ -88,6 +89,7 @@ export async function POST(req: NextRequest) {
         taxRate: invoiceData.taxRate || 0,
         taxAmount: calculated.taxAmount,
         discount: invoiceData.discount || 0,
+        discountType: invoiceData.discountType || "percentage",
         total: calculated.total,
         amountPaid: invoiceData.amountPaid || 0,
         notes: invoiceData.notes || "",

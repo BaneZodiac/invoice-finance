@@ -16,6 +16,8 @@ type Quotation = {
   subtotal: number
   taxRate: number
   taxAmount: number
+  discount: number
+  discountType: string
   total: number
   client: { id: string; name: string; email: string; address: string | null; phone: string | null }
   items: { id: string; description: string; quantity: number; unitPrice: number; amount: number }[]
@@ -220,6 +222,12 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
                 <span className="text-gray-600">Subtotal</span>
                 <span className="text-gray-900">{formatCurrency(quotation.subtotal)}</span>
               </div>
+              {quotation.discount > 0 && (
+                <div className="flex justify-between text-sm text-red-600">
+                  <span>Discount {quotation.discountType === "fixed" ? `($${quotation.discount.toFixed(2)})` : `(${quotation.discount}%)`}</span>
+                  <span>-{formatCurrency(quotation.discountType === "fixed" ? quotation.discount : quotation.subtotal * (quotation.discount / 100))}</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Tax ({quotation.taxRate}%)</span>
                 <span className="text-gray-900">{formatCurrency(quotation.taxAmount)}</span>

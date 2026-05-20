@@ -41,9 +41,18 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    if (body.name) {
+      const existing = await prisma.client.findFirst({
+        where: { name: { equals: body.name } },
+      });
+      if (existing) {
+        return Response.json({ error: "A client with this name already exists" }, { status: 409 });
+      }
+    }
     const client = await prisma.client.create({ data: body });
     return Response.json(client, { status: 201 });
   } catch (error) {
-    return Response.json({ error: "Failed to create client" }, { status: 500 });
+    const detail = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: "Failed to create client", detail }, { status: 500 });
   }
 }
