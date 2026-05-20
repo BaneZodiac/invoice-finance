@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/auth-context";
 import { SettingsProvider } from "@/contexts/settings-context";
+import { ThemeProvider } from "@/contexts/theme-context";
 import { AppShell } from "@/components/layout/app-shell";
 
 const geistSans = Geist({
@@ -28,12 +29,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="min-h-screen bg-gray-50 antialiased">
-        <AuthProvider>
-          <SettingsProvider>
-            <AppShell>{children}</AppShell>
-          </SettingsProvider>
-        </AuthProvider>
+      <body className="min-h-screen antialiased">
+        <ThemeProvider>
+          <AuthProvider>
+            <SettingsProvider>
+              <AppShell>{children}</AppShell>
+            </SettingsProvider>
+          </AuthProvider>
+        </ThemeProvider>
         <Toaster position="top-right" />
       </body>
     </html>

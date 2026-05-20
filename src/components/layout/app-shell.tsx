@@ -3,13 +3,15 @@
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "./sidebar";
-import { Menu } from "lucide-react";
+import { Menu, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/contexts/theme-context";
 
 const publicPaths = ["/login", "/signup"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const isPublic = publicPaths.some((p) => pathname.startsWith(p));
 
   if (isPublic) {
@@ -33,6 +35,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="text-xs font-bold text-white">NF</span>
             </div>
             <span className="text-sm font-semibold text-gray-900">Nomads Finance</span>
+          </div>
+          <div className="ml-auto">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-1 text-gray-500 hover:text-gray-700 cursor-pointer"
+            >
+              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
           </div>
         </div>
         <div className="p-4">

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #f8fafc;
@@ -14,6 +15,38 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+.dark {
+  --color-white: #1e293b;
+  --color-gray-50: #0f172a;
+  --color-gray-100: #1e293b;
+  --color-gray-200: #334155;
+  --color-gray-300: #475569;
+  --color-gray-400: #64748b;
+  --color-gray-500: #94a3b8;
+  --color-gray-600: #cbd5e1;
+  --color-gray-700: #d1d5db;
+  --color-gray-900: #f1f5f9;
+  --color-blue-50: #1e3a5f;
+  --color-blue-100: #1e3a5f;
+  --color-blue-600: #60a5fa;
+  --color-blue-700: #93c5fd;
+  --color-red-50: #450a0a;
+  --color-red-200: #7f1d1d;
+  --color-red-300: #7f1d1d;
+  --color-red-600: #fca5a5;
+  --color-green-50: #052e16;
+  --color-green-100: #052e16;
+  --color-green-600: #86efac;
+  --color-green-700: #4ade80;
+  --color-orange-600: #fdba74;
+  --color-sky-400: #38bdf8;
+  --color-yellow-400: #fbbf24;
+  --color-yellow-500: #eab308;
+  --color-indigo-600: #818cf8;
+  --background: #0f172a;
+  --foreground: #f1f5f9;
 }
 
 body {
