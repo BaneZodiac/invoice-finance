@@ -127,8 +127,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className, mobileOpen, onMobileClose 
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col transition-all duration-200 ease-in-out lg:hidden",
-          mobileOpen ? "left-0" : "-left-64"
+          "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col lg:hidden",
+          mobileOpen ? "block" : "hidden"
         )}
       >
         {content}
