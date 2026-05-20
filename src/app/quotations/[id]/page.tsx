@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ArrowLeft, Send, Edit, Trash2, FileText, Loader2 } from "lucide-react"
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils"
 import { useSettings } from "@/contexts/settings-context"
+import InvoicePDF from "@/components/invoice/invoice-pdf"
 
 type Quotation = {
   id: string
@@ -175,88 +176,139 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 no-print">{error}</div>
         )}
 
-        <div className="rounded-xl border border-gray-200 bg-white p-8">
-          <div className="flex items-start justify-between border-b border-gray-200 pb-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">{quotation.number}</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Issued: {formatDate(quotation.issueDate)}
-                <br />
-                Valid Until: {formatDate(quotation.validUntil)}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-xs font-medium uppercase text-gray-500">From</h3>
-              <p className="mt-2 text-sm font-medium text-gray-900">{settings?.companyName || "Nomads Finance"}</p>
-              {settings?.gst && <p className="mt-1 text-sm text-gray-600">GST: {settings.gst}</p>}
-              {settings?.companyEmail && <p className="mt-1 text-sm text-gray-600">{settings.companyEmail}</p>}
-              {settings?.mobile && <p className="text-sm text-gray-600">{settings.mobile}</p>}
-              {settings?.companyPhone && <p className="text-sm text-gray-600">{settings.companyPhone}</p>}
-              {settings?.website && <p className="text-sm text-gray-600">{settings.website}</p>}
-              {settings?.companyAddress && <p className="text-sm text-gray-600">{settings.companyAddress}</p>}
-            </div>
-            <div>
-              <h3 className="text-xs font-medium uppercase text-gray-500">Bill To</h3>
-              <p className="mt-2 text-sm font-medium text-gray-900">{quotation.client.name}</p>
-              {quotation.client.address && <p className="mt-1 text-sm text-gray-600">{quotation.client.address}</p>}
-              <p className="mt-1 text-sm text-gray-600">{quotation.client.email}</p>
-              {quotation.client.phone && <p className="text-sm text-gray-600">{quotation.client.phone}</p>}
-            </div>
-          </div>
-
-          <table className="mt-8 w-full">
-            <thead>
-              <tr className="border-b border-gray-200 text-left text-xs font-medium uppercase text-gray-500">
-                <th className="pb-3">Description</th>
-                <th className="pb-3">Qty</th>
-                <th className="pb-3 text-right">Unit Price</th>
-                <th className="pb-3 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {quotation.items.map((item) => (
-                <tr key={item.id}>
-                  <td className="py-4 text-sm text-gray-900">{item.description}</td>
-                  <td className="py-4 text-sm text-gray-600">{item.quantity}</td>
-                  <td className="py-4 text-right text-sm text-gray-600">{formatCurrency(item.unitPrice)}</td>
-                  <td className="py-4 text-right text-sm font-medium text-gray-900">{formatCurrency(item.amount)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="mt-6 border-t border-gray-200 pt-4">
-            <div className="ml-auto w-72 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="text-gray-900">{formatCurrency(quotation.subtotal)}</span>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <div className="rounded-xl border border-gray-200 bg-white p-8">
+              <div className="flex items-start justify-between border-b border-gray-200 pb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">{quotation.number}</h2>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Issued: {formatDate(quotation.issueDate)}
+                    <br />
+                    Valid Until: {formatDate(quotation.validUntil)}
+                  </p>
+                </div>
               </div>
-              {quotation.discount > 0 && (
-                <div className="flex justify-between text-sm text-red-600">
-                  <span>Discount {quotation.discountType === "fixed" ? `($${quotation.discount.toFixed(2)})` : `(${quotation.discount}%)`}</span>
-                  <span>-{formatCurrency(quotation.discountType === "fixed" ? quotation.discount : quotation.subtotal * (quotation.discount / 100))}</span>
+
+              <div className="mt-6 grid grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-xs font-medium uppercase text-gray-500">From</h3>
+                  <p className="mt-2 text-sm font-medium text-gray-900">{settings?.companyName || "Nomads Finance"}</p>
+                  {settings?.gst && <p className="mt-1 text-sm text-gray-600">GST: {settings.gst}</p>}
+                  {settings?.companyEmail && <p className="mt-1 text-sm text-gray-600">{settings.companyEmail}</p>}
+                  {settings?.mobile && <p className="text-sm text-gray-600">{settings.mobile}</p>}
+                  {settings?.companyPhone && <p className="text-sm text-gray-600">{settings.companyPhone}</p>}
+                  {settings?.website && <p className="text-sm text-gray-600">{settings.website}</p>}
+                  {settings?.companyAddress && <p className="text-sm text-gray-600">{settings.companyAddress}</p>}
+                </div>
+                <div>
+                  <h3 className="text-xs font-medium uppercase text-gray-500">Bill To</h3>
+                  <p className="mt-2 text-sm font-medium text-gray-900">{quotation.client.name}</p>
+                  {quotation.client.address && <p className="mt-1 text-sm text-gray-600">{quotation.client.address}</p>}
+                  <p className="mt-1 text-sm text-gray-600">{quotation.client.email}</p>
+                  {quotation.client.phone && <p className="text-sm text-gray-600">{quotation.client.phone}</p>}
+                </div>
+              </div>
+
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="mt-8 w-full min-w-[500px]">
+                <thead>
+                  <tr className="border-b border-gray-200 text-left text-xs font-medium uppercase text-gray-500">
+                    <th className="pb-3">Description</th>
+                    <th className="pb-3">Qty</th>
+                    <th className="pb-3 text-right">Unit Price</th>
+                    <th className="pb-3 text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {quotation.items.map((item) => (
+                    <tr key={item.id}>
+                      <td className="py-4 text-sm text-gray-900">{item.description}</td>
+                      <td className="py-4 text-sm text-gray-600">{item.quantity}</td>
+                      <td className="py-4 text-right text-sm text-gray-600">{formatCurrency(item.unitPrice)}</td>
+                      <td className="py-4 text-right text-sm font-medium text-gray-900">{formatCurrency(item.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+
+              <div className="mt-6 border-t border-gray-200 pt-4">
+                <div className="ml-auto w-72 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="text-gray-900">{formatCurrency(quotation.subtotal)}</span>
+                  </div>
+                  {quotation.discount > 0 && (
+                    <div className="flex justify-between text-sm text-red-600">
+                      <span>Discount {quotation.discountType === "fixed" ? `($${quotation.discount.toFixed(2)})` : `(${quotation.discount}%)`}</span>
+                      <span>-{formatCurrency(quotation.discountType === "fixed" ? quotation.discount : quotation.subtotal * (quotation.discount / 100))}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Tax ({quotation.taxRate}%)</span>
+                    <span className="text-gray-900">{formatCurrency(quotation.taxAmount)}</span>
+                  </div>
+                  <div className="flex justify-between border-t border-gray-200 pt-2 text-base font-semibold">
+                    <span className="text-gray-900">Total</span>
+                    <span className="text-gray-900">{formatCurrency(quotation.total)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {quotation.notes && (
+                <div className="mt-6 border-t border-gray-200 pt-4">
+                  <h3 className="text-xs font-medium uppercase text-gray-500">Notes</h3>
+                  <p className="mt-2 text-sm text-gray-600">{quotation.notes}</p>
                 </div>
               )}
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tax ({quotation.taxRate}%)</span>
-                <span className="text-gray-900">{formatCurrency(quotation.taxAmount)}</span>
-              </div>
-              <div className="flex justify-between border-t border-gray-200 pt-2 text-base font-semibold">
-                <span className="text-gray-900">Total</span>
-                <span className="text-gray-900">{formatCurrency(quotation.total)}</span>
-              </div>
             </div>
           </div>
 
-          {quotation.notes && (
-            <div className="mt-6 border-t border-gray-200 pt-4">
-              <h3 className="text-xs font-medium uppercase text-gray-500">Notes</h3>
-              <p className="mt-2 text-sm text-gray-600">{quotation.notes}</p>
+          <div className="space-y-4 no-print">
+            <div className="rounded-xl border border-gray-200 bg-white p-6">
+              <div className="space-y-2">
+                <InvoicePDF
+                  title="QUOTATION"
+                  dateLabel="Valid Until"
+                  invoiceNumber={quotation.number}
+                  status={quotation.status}
+                  issueDate={quotation.issueDate}
+                  dueDate={quotation.validUntil}
+                  company={{
+                    name: settings?.companyName || "Nomads Finance",
+                    logo: settings?.logo || undefined,
+                    email: settings?.companyEmail || undefined,
+                    phone: settings?.companyPhone || undefined,
+                    mobile: settings?.mobile || undefined,
+                    gst: settings?.gst || undefined,
+                    website: settings?.website || undefined,
+                    address: settings?.companyAddress || undefined,
+                  }}
+                  client={{
+                    name: quotation.client.name,
+                    email: quotation.client.email,
+                    address: quotation.client.address || undefined,
+                    phone: quotation.client.phone || undefined,
+                  }}
+                  items={quotation.items.map((item) => ({
+                    description: item.description,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice,
+                    amount: item.amount,
+                  }))}
+                  subtotal={quotation.subtotal}
+                  taxRate={quotation.taxRate}
+                  taxAmount={quotation.taxAmount}
+                  discount={quotation.discount}
+                  discountAmount={quotation.discountType === "fixed" ? quotation.discount : quotation.subtotal * (quotation.discount / 100)}
+                  discountType={quotation.discountType}
+                  total={quotation.total}
+                  notes={quotation.notes || undefined}
+                />
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

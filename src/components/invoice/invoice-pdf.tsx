@@ -88,6 +88,8 @@ interface InvoicePdfProps {
   currency?: string;
   invoice?: InvoiceData;
   className?: string;
+  title?: string;
+  dateLabel?: string;
 }
 
 function formatCurrency(amount: number, currency = "USD"): string {
@@ -121,6 +123,8 @@ function InvoicePdf(props: InvoicePdfProps) {
   const invoiceDiscount = props.discount ?? data?.discount ?? 0;
   const invoiceDiscountAmount = props.discountAmount ?? data?.discountAmount ?? 0;
   const invoiceTotal = props.total ?? data?.total ?? 0;
+  const docTitle = props.title || "INVOICE";
+  const docDateLabel = props.dateLabel || "Due Date";
   const currency = props.currency || getDefaultCurrency();
 
   const companyInfo = props.company;
@@ -273,7 +277,7 @@ function InvoicePdf(props: InvoicePdfProps) {
                       </td>
                       <td style={{ textAlign: "right", verticalAlign: "top" }}>
                         <div style={{ fontSize: "24px", fontWeight: "800", color: "#2563eb", marginBottom: "4px" }}>
-                          INVOICE
+                          {docTitle}
                         </div>
                         <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "8px" }}>
                           <span style={{ fontWeight: "600", color: "#374151" }}>Number:</span>{" "}
@@ -314,7 +318,7 @@ function InvoicePdf(props: InvoicePdfProps) {
                           {formatDate(issueDate)}
                         </div>
                         <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "2px" }}>
-                          <span style={{ fontWeight: "600", color: "#374151" }}>Due Date:</span>{" "}
+                          <span style={{ fontWeight: "600", color: "#374151" }}>{docDateLabel}:</span>{" "}
                           {formatDate(dueDate)}
                         </div>
                       </td>
