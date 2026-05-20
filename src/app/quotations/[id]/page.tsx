@@ -103,7 +103,7 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
   return (
     <div className="flex min-h-screen bg-gray-50">
       <div className="flex-1 space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between no-print">
           <div className="flex items-center gap-4">
             <button onClick={() => router.push("/quotations")} className="rounded p-1 text-gray-400 hover:text-gray-600">
               <ArrowLeft className="h-5 w-5" />
@@ -113,7 +113,7 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
               {quotation.status}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 no-print">
             {quotation.status === "draft" && (
               <button
                 onClick={() => handleAction("send")}
@@ -168,7 +168,7 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
         </div>
 
         {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 no-print">{error}</div>
         )}
 
         <div className="rounded-xl border border-gray-200 bg-white p-8">

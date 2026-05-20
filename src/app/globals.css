@@ -23,7 +23,19 @@ body {
 
 @media print {
   .no-print { display: none !important; }
-  body { background: white; }
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  @page { margin: 0.5in; }
+  .min-h-screen { min-height: auto !important; }
+  .bg-gray-50 { background: white !important; }
+  div.rounded-xl.border {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
 }
 
 @media (max-width: 1023px) {
