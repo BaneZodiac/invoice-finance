@@ -1,9 +1,18 @@
 import { prisma } from "@/lib/db";
 import { NextRequest } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const search = req.nextUrl.searchParams.get("search");
+    const where: Record<string, unknown> = {};
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+      ];
+    }
     const clients = await prisma.client.findMany({
+      where,
       orderBy: { createdAt: "desc" },
       include: {
         _count: { select: { invoices: true } },

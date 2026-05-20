@@ -102,7 +102,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <div className="flex-1 space-y-6 p-8">
+      <div className="flex-1 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => router.push("/invoices")} className="rounded p-1 text-gray-400 hover:text-gray-600">
@@ -190,7 +190,8 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
 
-              <table className="mt-8 w-full">
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="mt-8 w-full min-w-[500px]">
                 <thead>
                   <tr className="border-b border-gray-200 text-left text-xs font-medium uppercase text-gray-500">
                     <th className="pb-3">Description</th>
@@ -210,6 +211,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
                   ))}
                 </tbody>
               </table>
+              </div>
 
               <div className="mt-6 border-t border-gray-200 pt-4">
                 <div className="ml-auto w-72 space-y-2">
