@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Mail, Phone, MapPin, Edit, FileText, Loader2 } from "lucide-react"
+import { ArrowLeft, Mail, Phone, MapPin, Edit, FileText, Loader2, Trash2 } from "lucide-react"
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils"
 
 type Client = {
@@ -93,6 +93,22 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
               <Edit className="h-4 w-4" />
               Edit
             </Link>
+            <button
+              onClick={() => {
+                if (confirm(`Delete "${client.name}"? This cannot be undone.`)) {
+                  fetch(`/api/clients/${id}`, { method: "DELETE" })
+                    .then((r) => {
+                      if (!r.ok) throw new Error()
+                      router.push("/clients")
+                    })
+                    .catch(() => alert("Failed to delete client. Remove invoices/quotations first."))
+                }
+              }}
+              className="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </button>
           </div>
         </div>
 

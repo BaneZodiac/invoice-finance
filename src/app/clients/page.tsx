@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Plus, Search, Mail, Phone, MapPin, Loader2, GitMerge } from "lucide-react"
+import { Plus, Search, Mail, Phone, MapPin, Loader2, GitMerge, Trash2 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 
 type Client = {
@@ -113,34 +113,53 @@ export default function ClientsPage() {
             {clients.map((client) => (
               <div
                 key={client.id}
-                onClick={() => router.push(`/clients/${client.id}`)}
-                className="cursor-pointer rounded-xl border border-gray-200 bg-white p-6 hover:shadow-sm"
+                className="group relative rounded-xl border border-gray-200 bg-white p-6 hover:shadow-sm"
               >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-lg font-semibold text-blue-600">
-                  {client.name.charAt(0).toUpperCase()}
+                <div className="absolute right-3 top-3 z-10 hidden gap-1 group-hover:flex">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (confirm(`Delete "${client.name}"? This cannot be undone.`)) {
+                        fetch(`/api/clients/${client.id}`, { method: "DELETE" })
+                          .then((r) => {
+                            if (!r.ok) throw new Error()
+                            setClients((prev) => prev.filter((c) => c.id !== client.id))
+                          })
+                          .catch(() => alert("Failed to delete client. Remove invoices/quotations first."))
+                      }
+                    }}
+                    className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{client.name}</h3>
-                <div className="mt-3 space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Mail className="h-4 w-4" />
-                    {client.email}
+                <div onClick={() => router.push(`/clients/${client.id}`)} className="cursor-pointer">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-lg font-semibold text-blue-600">
+                    {client.name.charAt(0).toUpperCase()}
                   </div>
-                  {client.phone && (
+                  <h3 className="text-lg font-semibold text-gray-900">{client.name}</h3>
+                  <div className="mt-3 space-y-2">
                     <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <Phone className="h-4 w-4" />
-                      {client.phone}
+                      <Mail className="h-4 w-4" />
+                      {client.email}
                     </div>
-                  )}
-                  {client.address && (
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <MapPin className="h-4 w-4" />
-                      {client.address}
-                    </div>
-                  )}
-                </div>
-                <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
-                  <span className="text-sm text-gray-500">{client._count.invoices} invoices</span>
-                  <span className="text-sm font-medium text-gray-900">{formatCurrency(client.totalBilled)}</span>
+                    {client.phone && (
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Phone className="h-4 w-4" />
+                        {client.phone}
+                      </div>
+                    )}
+                    {client.address && (
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <MapPin className="h-4 w-4" />
+                        {client.address}
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
+                    <span className="text-sm text-gray-500">{client._count.invoices} invoices</span>
+                    <span className="text-sm font-medium text-gray-900">{formatCurrency(client.totalBilled)}</span>
+                  </div>
                 </div>
               </div>
             ))}
