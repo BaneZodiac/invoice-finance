@@ -44,6 +44,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
 
   const handleAction = async (action: string) => {
     setActionLoading(action)
+    setError("")
     const statusMap: Record<string, string> = { send: "sent", "mark-paid": "paid" }
     try {
       const res = await fetch(`/api/invoices/${id}/status`, {
@@ -54,17 +55,29 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       if (res.ok) {
         const updated = await res.json()
         setInvoice(updated)
+      } else {
+        const err = await res.json()
+        setError(err.error || err.message || "Failed to update status")
       }
-    } catch {}
+    } catch {
+      setError("Failed to update status")
+    }
     setActionLoading("")
   }
 
   const handleDelete = async () => {
     setActionLoading("delete")
+    setError("")
     try {
       const res = await fetch(`/api/invoices/${id}`, { method: "DELETE" })
       if (res.ok) router.push("/invoices")
-    } catch {}
+      else {
+        const err = await res.json()
+        setError(err.error || err.message || "Failed to delete")
+      }
+    } catch {
+      setError("Failed to delete invoice")
+    }
     setActionLoading("")
   }
 
@@ -147,6 +160,10 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
             </button>
           </div>
         </div>
+
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">

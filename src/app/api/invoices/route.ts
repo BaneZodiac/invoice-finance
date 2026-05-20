@@ -63,11 +63,11 @@ export async function POST(req: NextRequest) {
       if (company) invoiceData.companyId = company.id;
     }
 
-    const lineItems = items?.map((item: { description: string; quantity: number; unitPrice: number }) => ({
+    const lineItems = items?.map((item: { description: string; quantity: unknown; unitPrice: unknown }) => ({
       description: item.description,
-      quantity: item.quantity || 1,
-      unitPrice: item.unitPrice || 0,
-      amount: (item.quantity || 1) * (item.unitPrice || 0),
+      quantity: Number(item.quantity) || 1,
+      unitPrice: Number(item.unitPrice) || 0,
+      amount: (Number(item.quantity) || 1) * (Number(item.unitPrice) || 0),
     })) || [];
 
     const subtotal = lineItems.reduce((sum: number, item: { amount: number }) => sum + item.amount, 0);

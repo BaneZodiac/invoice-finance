@@ -101,10 +101,11 @@ function InvoiceForm({
     setFormData((prev) => {
       const items = prev.items.map((item) => {
         if (item.id !== id) return item;
-        const updated = { ...item, [field]: value };
+        const numValue = field === "quantity" || field === "unitPrice" ? Number(value) : value;
+        const updated = { ...item, [field]: numValue };
         if (field === "quantity" || field === "unitPrice") {
-          const qty = field === "quantity" ? Number(value) : item.quantity;
-          const price = field === "unitPrice" ? Number(value) : item.unitPrice;
+          const qty = field === "quantity" ? Number(value) : (typeof item.quantity === "number" ? item.quantity : Number(item.quantity));
+          const price = field === "unitPrice" ? Number(value) : (typeof item.unitPrice === "number" ? item.unitPrice : Number(item.unitPrice));
           updated.amount = calculateAmount(qty, price);
         }
         return updated;
@@ -141,18 +142,27 @@ function InvoiceForm({
 
     let data = { ...formData };
 
-    if (showNewClient && newClientName.trim()) {
+    if (showNewClient) {
+      const name = newClientName.trim();
+      if (!name) return;
       try {
         const res = await fetch("/api/clients", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: newClientName.trim() }),
+          body: JSON.stringify({ name }),
         });
         if (res.ok) {
           const client = await res.json();
           data.clientId = client.id;
+        } else {
+          const err = await res.json();
+          alert(err.error || err.message || "Failed to create client");
+          return;
         }
-      } catch {}
+      } catch {
+        alert("Failed to create client");
+        return;
+      }
     }
 
     if (onSubmit) {

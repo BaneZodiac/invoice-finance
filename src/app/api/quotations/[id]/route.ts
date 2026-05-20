@@ -41,8 +41,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (quotationData.clientId !== undefined) updateData.clientId = quotationData.clientId;
 
     if (items !== undefined) {
-      let subtotal = items.reduce((sum: number, item: { quantity: number; unitPrice: number; amount?: number }) => {
-        return sum + (item.amount || (item.quantity || 1) * (item.unitPrice || 0));
+      let subtotal = items.reduce((sum: number, item: { quantity: unknown; unitPrice: unknown; amount?: unknown }) => {
+        return sum + (Number(item.amount) || (Number(item.quantity) || 1) * (Number(item.unitPrice) || 0));
       }, 0);
       const calculated = calculateInvoice(subtotal, quotationData.taxRate ?? 0, quotationData.discount ?? 0);
       updateData.subtotal = calculated.subtotal;
@@ -60,11 +60,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (items !== undefined) {
       await prisma.quotationItem.deleteMany({ where: { quotationId: id } });
       await prisma.quotationItem.createMany({
-        data: items.map((item: { description: string; quantity: number; unitPrice: number }) => ({
+        data: items.map((item: { description: string; quantity: unknown; unitPrice: unknown }) => ({
           description: item.description,
-          quantity: item.quantity || 1,
-          unitPrice: item.unitPrice || 0,
-          amount: (item.quantity || 1) * (item.unitPrice || 0),
+          quantity: Number(item.quantity) || 1,
+          unitPrice: Number(item.unitPrice) || 0,
+          amount: (Number(item.quantity) || 1) * (Number(item.unitPrice) || 0),
           quotationId: id,
         })),
       });

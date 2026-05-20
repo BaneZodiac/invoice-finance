@@ -1,14 +1,27 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import InvoiceForm from "@/components/invoice/invoice-form"
+import type { Client } from "@/components/invoice/invoice-form"
 import { Loader2 } from "lucide-react"
 
 export default function NewQuotationPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [clients, setClients] = useState<Client[]>([])
+  const [loadingClients, setLoadingClients] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/clients")
+      .then((r) => r.json())
+      .then((data) => {
+        setClients(data.clients || data || [])
+      })
+      .catch(() => setError("Failed to load clients"))
+      .finally(() => setLoadingClients(false))
+  }, [])
 
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
@@ -21,7 +34,7 @@ export default function NewQuotationPage() {
       })
       if (!res.ok) {
         const err = await res.json()
-        throw new Error(err.error || err.message || "Failed to create quotation")
+        throw new Error(err.detail || err.error || err.message || "Failed to create quotation")
       }
       const quotation = await res.json()
       router.push(`/quotations/${quotation.id}`)
@@ -44,7 +57,7 @@ export default function NewQuotationPage() {
         )}
 
         <div className="rounded-xl border border-gray-200 bg-white p-6">
-          <InvoiceForm onSubmit={handleSubmit} isSubmitting={isSubmitting} quotation />
+          <InvoiceForm onSubmit={handleSubmit} isSubmitting={isSubmitting} clients={clients} loading={loadingClients} quotation />
         </div>
 
         {isSubmitting && (

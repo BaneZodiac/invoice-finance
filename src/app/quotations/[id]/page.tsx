@@ -42,6 +42,7 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
 
   const handleAction = async (action: string) => {
     setActionLoading(action)
+    setError("")
     const statusMap: Record<string, string> = { send: "sent", accept: "accepted", reject: "rejected" }
     try {
       const res = await fetch(`/api/quotations/${id}`, {
@@ -52,20 +53,31 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
       if (res.ok) {
         const updated = await res.json()
         setQuotation(updated)
+      } else {
+        const err = await res.json()
+        setError(err.error || err.message || "Failed to update status")
       }
-    } catch {}
+    } catch {
+      setError("Failed to update status")
+    }
     setActionLoading("")
   }
 
   const convertToInvoice = async () => {
     setActionLoading("convert")
+    setError("")
     try {
       const res = await fetch(`/api/quotations/${id}/convert`, { method: "POST" })
       if (res.ok) {
         const invoice = await res.json()
         router.push(`/invoices/${invoice.id}`)
+      } else {
+        const err = await res.json()
+        setError(err.error || err.message || "Failed to convert")
       }
-    } catch {}
+    } catch {
+      setError("Failed to convert to invoice")
+    }
     setActionLoading("")
   }
 
@@ -133,10 +145,17 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
               onClick={async () => {
                 if (!confirm("Delete this quotation?")) return
                 setActionLoading("delete")
+                setError("")
                 try {
                   const res = await fetch(`/api/quotations/${id}`, { method: "DELETE" })
                   if (res.ok) router.push("/quotations")
-                } catch {}
+                  else {
+                    const err = await res.json()
+                    setError(err.error || err.message || "Failed to delete")
+                  }
+                } catch {
+                  setError("Failed to delete quotation")
+                }
                 setActionLoading("")
               }}
               disabled={actionLoading === "delete"}
@@ -147,6 +166,10 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
             </button>
           </div>
         </div>
+
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+        )}
 
         <div className="rounded-xl border border-gray-200 bg-white p-8">
           <div className="flex items-start justify-between border-b border-gray-200 pb-6">
