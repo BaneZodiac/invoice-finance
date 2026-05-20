@@ -47,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, mobileOpen, onMobileClose 
           </div>
           <span className="text-lg font-bold text-gray-900">Nomads Finance</span>
         </Link>
-        <button onClick={onMobileClose} className="lg:hidden p-1 text-gray-400 hover:text-gray-600">
+        <button type="button" onClick={onMobileClose} className="lg:hidden p-1 text-gray-400 hover:text-gray-600 cursor-pointer">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -60,12 +60,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className, mobileOpen, onMobileClose 
             (item.href !== "/" && pathname.startsWith(item.href));
 
           return (
-            <Link
+              <Link
               key={item.href}
               href={item.href}
               onClick={onMobileClose}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer",
                 isActive
                   ? "bg-blue-50 text-blue-700"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -93,8 +93,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className, mobileOpen, onMobileClose 
           </div>
         )}
         <button
+          type="button"
           onClick={signOut}
-          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors cursor-pointer"
         >
           <LogOut className="w-5 h-5 flex-shrink-0" />
           <span>Sign out</span>
@@ -126,8 +127,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className, mobileOpen, onMobileClose 
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col transform transition-transform duration-200 ease-in-out lg:hidden",
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col transition-all duration-200 ease-in-out lg:hidden",
+          mobileOpen ? "left-0" : "-left-64"
         )}
       >
         {content}
