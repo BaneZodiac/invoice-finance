@@ -6,19 +6,17 @@ const publicPaths = ["/login", "/signup", "/auth/callback"];
 export async function proxy(request: NextRequest) {
   const { supabase, supabaseResponse } = createClient(request);
 
-  if (supabase) {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { pathname } = request.nextUrl;
+  if (publicPaths.some((p) => request.nextUrl.pathname.startsWith(p))) {
+    return supabaseResponse;
+  }
 
-    if (!user && !publicPaths.some((p) => pathname.startsWith(p))) {
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = "/login";
-      return NextResponse.redirect(url);
-    }
-
-    if (user && publicPaths.some((p) => pathname.startsWith(p))) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
       return NextResponse.redirect(url);
     }
   }
@@ -27,7 +25,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.png$).*)"],
 };
