@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Download, Send, Edit, Trash2, Loader2, Check } from "lucide-react"
+import { ArrowLeft, Download, Send, Edit, Trash2, Loader2, Copy } from "lucide-react"
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils"
 import { useSettings } from "@/contexts/settings-context"
 import InvoicePDF from "@/components/invoice/invoice-pdf"
@@ -186,6 +186,30 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               <Edit className="h-4 w-4" />
               Edit
             </Link>
+            <button
+              onClick={async () => {
+                setActionLoading("duplicate")
+                setError("")
+                try {
+                  const res = await fetch(`/api/invoices/${id}/duplicate`, { method: "POST" })
+                  if (res.ok) {
+                    const dup = await res.json()
+                    router.push(`/invoices/${dup.id}`)
+                  } else {
+                    const err = await res.json()
+                    setError(err.error || err.message || "Failed to duplicate")
+                  }
+                } catch {
+                  setError("Failed to duplicate invoice")
+                }
+                setActionLoading("")
+              }}
+              disabled={actionLoading === "duplicate"}
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            >
+              {actionLoading === "duplicate" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
+              Duplicate
+            </button>
             <button
               onClick={() => {
                 if (confirm("Delete this invoice?")) handleDelete()

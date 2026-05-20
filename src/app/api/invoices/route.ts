@@ -11,6 +11,14 @@ export async function GET(req: NextRequest) {
     const clientId = url.searchParams.get("clientId");
     const search = url.searchParams.get("search");
 
+    await prisma.invoice.updateMany({
+      where: {
+        status: "sent",
+        dueDate: { lt: new Date() },
+      },
+      data: { status: "overdue" },
+    });
+
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
