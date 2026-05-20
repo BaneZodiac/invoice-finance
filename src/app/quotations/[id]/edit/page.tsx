@@ -58,7 +58,7 @@ export default function EditQuotationPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <div className="flex-1 space-y-6 p-8">
+      <div className="flex-1 space-y-6">
         <h1 className="text-2xl font-semibold text-gray-900">Edit Quotation</h1>
         {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
         <div className="rounded-xl border border-gray-200 bg-white p-6">

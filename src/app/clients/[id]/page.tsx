@@ -64,7 +64,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <div className="flex-1 space-y-6 p-8">
+      <div className="flex-1 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => router.push("/clients")} className="rounded p-1 text-gray-400 hover:text-gray-600">

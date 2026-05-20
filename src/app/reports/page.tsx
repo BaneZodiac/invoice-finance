@@ -73,7 +73,7 @@ export default function ReportsPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <div className="flex-1 space-y-6 p-8">
+      <div className="flex-1 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold text-gray-900">Reports</h1>
           <div className="flex items-center gap-3">
