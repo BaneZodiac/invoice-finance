@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Send, Edit, Trash2, FileText, Loader2 } from "lucide-react"
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils"
+import { useSettings } from "@/contexts/settings-context"
 
 type Quotation = {
   id: string
@@ -26,6 +27,7 @@ type Quotation = {
 export default function QuotationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
+  const { settings } = useSettings()
   const [quotation, setQuotation] = useState<Quotation | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -186,6 +188,16 @@ export default function QuotationDetailPage({ params }: { params: Promise<{ id: 
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-xs font-medium uppercase text-gray-500">From</h3>
+              <p className="mt-2 text-sm font-medium text-gray-900">{settings?.companyName || "Nomads Finance"}</p>
+              {settings?.gst && <p className="mt-1 text-sm text-gray-600">GST: {settings.gst}</p>}
+              {settings?.companyEmail && <p className="mt-1 text-sm text-gray-600">{settings.companyEmail}</p>}
+              {settings?.mobile && <p className="text-sm text-gray-600">{settings.mobile}</p>}
+              {settings?.companyPhone && <p className="text-sm text-gray-600">{settings.companyPhone}</p>}
+              {settings?.website && <p className="text-sm text-gray-600">{settings.website}</p>}
+              {settings?.companyAddress && <p className="text-sm text-gray-600">{settings.companyAddress}</p>}
+            </div>
             <div>
               <h3 className="text-xs font-medium uppercase text-gray-500">Bill To</h3>
               <p className="mt-2 text-sm font-medium text-gray-900">{quotation.client.name}</p>

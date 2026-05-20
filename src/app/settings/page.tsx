@@ -8,6 +8,9 @@ type Settings = {
   companyEmail: string
   companyPhone: string
   companyAddress: string
+  gst: string
+  website: string
+  mobile: string
   logo: string | null
   taxRate: number
   currency: string
@@ -22,6 +25,9 @@ const defaultSettings: Settings = {
   companyEmail: "",
   companyPhone: "",
   companyAddress: "",
+  gst: "",
+  website: "",
+  mobile: "",
   logo: null,
   taxRate: 0,
   currency: "USD",
@@ -165,6 +171,33 @@ export default function SettingsPage() {
                   type="text"
                   value={settings.companyPhone}
                   onChange={(e) => setSettings({ ...settings, companyPhone: e.target.value })}
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">GST Number</label>
+                <input
+                  type="text"
+                  value={settings.gst}
+                  onChange={(e) => setSettings({ ...settings, gst: e.target.value })}
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Website</label>
+                <input
+                  type="text"
+                  value={settings.website}
+                  onChange={(e) => setSettings({ ...settings, website: e.target.value })}
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Mobile</label>
+                <input
+                  type="text"
+                  value={settings.mobile}
+                  onChange={(e) => setSettings({ ...settings, mobile: e.target.value })}
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
                 />
               </div>

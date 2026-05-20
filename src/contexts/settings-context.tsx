@@ -8,6 +8,9 @@ type Settings = {
   companyEmail: string;
   companyPhone: string;
   companyAddress: string;
+  gst: string;
+  website: string;
+  mobile: string;
   logo: string | null;
   taxRate: number;
   currency: string;
@@ -27,6 +30,9 @@ const defaultSettings: Settings = {
   companyEmail: "",
   companyPhone: "",
   companyAddress: "",
+  gst: "",
+  website: "",
+  mobile: "",
   logo: null,
   taxRate: 0,
   currency: "USD",

@@ -16,6 +16,9 @@ interface CompanyInfo {
   country?: string;
   email?: string;
   phone?: string;
+  gst?: string;
+  website?: string;
+  mobile?: string;
 }
 
 interface ClientInfo {
@@ -221,9 +224,24 @@ function InvoicePdf(props: InvoicePdfProps) {
                             {companyName}
                           </div>
                         </div>
-                        {props.company?.email && (
+                        {props.company?.gst && (
                           <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>
+                            GST: {props.company.gst}
+                          </div>
+                        )}
+                        {props.company?.website && (
+                          <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                            {props.company.website}
+                          </div>
+                        )}
+                        {props.company?.email && (
+                          <div style={{ fontSize: "12px", color: "#6b7280" }}>
                             {props.company.email}
+                          </div>
+                        )}
+                        {props.company?.mobile && (
+                          <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                            {props.company.mobile}
                           </div>
                         )}
                         {props.company?.phone && (

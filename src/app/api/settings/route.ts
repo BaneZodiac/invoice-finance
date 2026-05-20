@@ -9,12 +9,15 @@ async function getOrCreateCompany() {
   return company;
 }
 
-function toSettings(company: { name: string; email: string; phone: string; address: string; logo: string; taxRate: number; currency: string; invoicePrefix: string; quotationPrefix: string; defaultPaymentTerms: number; defaultDueDays: number }) {
+function toSettings(company: { name: string; email: string; phone: string; address: string; gst: string; website: string; mobile: string; logo: string; taxRate: number; currency: string; invoicePrefix: string; quotationPrefix: string; defaultPaymentTerms: number; defaultDueDays: number }) {
   return {
     companyName: company.name,
     companyEmail: company.email,
     companyPhone: company.phone,
     companyAddress: company.address,
+    gst: company.gst,
+    website: company.website,
+    mobile: company.mobile,
     logo: company.logo,
     taxRate: company.taxRate,
     currency: company.currency,
@@ -45,6 +48,9 @@ export async function PUT(req: NextRequest) {
           email: body.companyEmail || "",
           phone: body.companyPhone || "",
           address: body.companyAddress || "",
+          gst: body.gst || "",
+          website: body.website || "",
+          mobile: body.mobile || "",
           logo: body.logo || "",
           taxRate: body.taxRate ?? 0,
           currency: body.currency || "USD",
@@ -62,6 +68,9 @@ export async function PUT(req: NextRequest) {
           email: body.companyEmail,
           phone: body.companyPhone,
           address: body.companyAddress,
+          gst: body.gst,
+          website: body.website,
+          mobile: body.mobile,
           logo: body.logo,
           taxRate: body.taxRate,
           currency: body.currency,
@@ -87,6 +96,9 @@ export async function POST(req: NextRequest) {
         email: body.companyEmail || "",
         phone: body.companyPhone || "",
         address: body.companyAddress || "",
+        gst: body.gst || "",
+        website: body.website || "",
+        mobile: body.mobile || "",
         logo: body.logo || "",
         taxRate: body.taxRate ?? 0,
         currency: body.currency || "USD",
