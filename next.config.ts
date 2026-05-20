@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [],
   },
   serverExternalPackages: ["@prisma/client", "@prisma/adapter-libsql"],
+  turbopack: {
+    root: process.cwd(),
+  },
 };
 
 export default nextConfig;
