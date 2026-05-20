@@ -153,12 +153,32 @@ function InvoicePdf(props: InvoicePdfProps) {
     const element = printRef.current;
     if (!element) return;
 
+    const originalWidth = element.style.width;
+    const originalPadding = element.style.padding;
+    const originalBorder = element.style.border;
+    const originalBorderRadius = element.style.borderRadius;
+    const originalBoxShadow = element.style.boxShadow;
+    const A4_WIDTH_PX = 794;
+
+    element.style.width = `${A4_WIDTH_PX}px`;
+    element.style.padding = "0";
+    element.style.border = "none";
+    element.style.borderRadius = "0";
+    element.style.boxShadow = "none";
+
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: "#ffffff",
+      width: A4_WIDTH_PX,
     });
+
+    element.style.width = originalWidth || "";
+    element.style.padding = originalPadding || "";
+    element.style.border = originalBorder || "";
+    element.style.borderRadius = originalBorderRadius || "";
+    element.style.boxShadow = originalBoxShadow || "";
 
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF({
@@ -169,24 +189,20 @@ function InvoicePdf(props: InvoicePdfProps) {
 
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
-    const ratio = Math.min(pdfWidth / canvasWidth, pdfHeight / canvasHeight);
-    const imgWidth = canvasWidth * ratio;
-    const imgHeight = canvasHeight * ratio;
+    const imgWidth = pdfWidth;
+    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
     let heightLeft = imgHeight;
     let position = 0;
-    const pageHeight = pdfHeight;
 
     pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    heightLeft -= pdfHeight;
 
     while (heightLeft > 0) {
       position = heightLeft - imgHeight;
       pdf.addPage();
       pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      heightLeft -= pdfHeight;
     }
 
     pdf.save(`${invoiceNumber}.pdf`);
